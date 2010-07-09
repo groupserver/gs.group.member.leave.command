@@ -25,8 +25,6 @@ setup(name='gs.group.member.leave',
     zip_safe=False,
     install_requires=[
         'setuptools',
-        'Products.GSProfile',
-        'Products.GSGroupMember',
         # -*- Extra requirements: -*-
     ],
     entry_points="""
