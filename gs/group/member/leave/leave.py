@@ -22,6 +22,13 @@ class LeaveForm(PageForm):
         self.form_fields = Fields(LeaveFields(self.groupInfo).fields)
         self.form_fields['changeSubscription'].custom_widget = radio_widget
         
+    def setUpWidgets(self, ignore_request=False):
+        self.widgets = form.setUpWidgets(
+            self.form_fields, self.prefix, self.context,
+            self.request, form=self,
+            ignore_request=ignore_request)
+        self.widgets['changeSubscription']._displayItemForMissingValue = False
+        
     @form.action(label=u'Change', failure='handle_change_action_failure')
     def handle_change(self, action, data):
         status = u'Something changed!'
