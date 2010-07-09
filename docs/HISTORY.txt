@@ -1,0 +1,9 @@
+Changelog
+=========
+
+1.0 - Unreleased
+-----------------
+
+* Created new product for leaving a group
+* Moved the group-leaving-auditor from Products.GSGroupMember
+
