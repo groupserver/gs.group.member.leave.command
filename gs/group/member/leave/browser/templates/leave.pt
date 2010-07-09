@@ -29,9 +29,6 @@
       <form enctype="multipart/form-data"  method="post" action="."
         tal:attributes="action request/URL" id="change-subscription">
         <h1 tal:content="view/label">Change Subscription to Group Name</h1>
-        <p>
-          Want less email?
-        </p>
         <tal:block define="widgets view/widgets">
           <tal:block replace="structure provider:groupserver.FormWidgets"/>
         </tal:block>

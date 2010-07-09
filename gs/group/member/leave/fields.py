@@ -1,9 +1,10 @@
 # coding=utf-8
-from zope.formlib.form import Fields
+from zope.component import createObject
 from zope.schema import Choice
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from Products.XWFCore.XWFUtils import comma_comma_and
 from Products.GSGroup.joining import GSGroupJoining, ANYONE, REQUEST, INVITE
+from Products.CustomUserFolder.interfaces import IGSUserInfo
 
 class LeaveFields(object):
     def __init__(self, groupInfo):
@@ -11,18 +12,16 @@ class LeaveFields(object):
         self.__rejoinAdvice = self.__leaveTerm = None
         self.__fields = self.__vocab = None
     
-    def __call__(self, context):
-        return self.fields
-    
     @property
     def fields(self):
         if self.__fields == None:
-            self.__fields = Fields(Choice(
-              title=u'Change Subscription',
+            self.__fields = Choice(
+              __name__=u'changeSubscription',
+              title=u'Want less email?',
               description=u'These options are shown to a group member '\
                 u'wishing to leave the group',
               required=True,
-              vocabulary=self.vocab))
+              vocabulary=self.vocab)
         return self.__fields
     
     @property
@@ -48,13 +47,17 @@ class LeaveFields(object):
             if joinability == ANYONE:
                 self.__rejoinAdvice = u'you can rejoin at any time'
             elif joinability == REQUEST:
-                admins = self.groupInfo.group_admins
+                #admins = self.groupInfo.group_admins
+                #admins = self.groupInfo.groupObj.users_with_local_role('GroupAdmin')
+                admins = [createObject('groupserver.LoggedInUser', self.groupInfo.groupObj)]
                 self.__rejoinAdvice = u'to rejoin, you can apply to '\
-                  u'%s at any time' % comma_comma_and(admins)
+                  u'%s at any time' % comma_comma_and([a.name for a in admins])
             elif joinability == INVITE:
-                admins = self.groupInfo.group_admins
+                #admins = self.groupInfo.group_admins
+                #admins = self.groupInfo.groupObj.users_with_local_role('GroupAdmin')
+                admins = [createObject('groupserver.LoggedInUser', self.groupInfo.groupObj)]
                 self.__rejoinAdvice = u'to rejoin, you must be '\
-                  u'invited by %s' % comma_comma_and(admins, conj='or')
+                  u'invited by %s' % comma_comma_and([a.name for a in admins], conj='or')
             else:
                 self.__rejoinAdvice = u''
         return self.__rejoinAdvice
