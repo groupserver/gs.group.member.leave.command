@@ -55,6 +55,8 @@ class LeaveFields(object):
             elif joinability == INVITE:
                 #admins = self.groupInfo.group_admins
                 admins = group_admins(self.groupInfo)
+                #self.__rejoinAdvice = u'to rejoin, you must be '\
+                #  u'invited by %s' % comma_comma_and([userInfo_to_anchor(a) for a in admins], conj='or')
                 self.__rejoinAdvice = u'to rejoin, you must be '\
                   u'invited by %s' % comma_comma_and([userInfo_to_anchor(a) for a in admins])
             else:
