@@ -48,13 +48,13 @@ class LeaveFields(object):
             if joinability == ANYONE:
                 self.__rejoinAdvice = u'you can rejoin at any time'
             elif joinability == REQUEST:
-                #admins = self.groupInfo.group_admins
-                admins = group_admins(self.groupInfo)
+                admins = self.groupInfo.group_admins
+                #self.__rejoinAdvice = u'to rejoin, you must be '\
+                #  u'invited by %s' % comma_comma_and([userInfo_to_anchor(a) for a in admins], conj='or')
                 self.__rejoinAdvice = u'to rejoin, you can apply to '\
                   u'%s at any time' % comma_comma_and([userInfo_to_anchor(a) for a in admins])
             elif joinability == INVITE:
-                #admins = self.groupInfo.group_admins
-                admins = group_admins(self.groupInfo)
+                admins = self.groupInfo.group_admins
                 #self.__rejoinAdvice = u'to rejoin, you must be '\
                 #  u'invited by %s' % comma_comma_and([userInfo_to_anchor(a) for a in admins], conj='or')
                 self.__rejoinAdvice = u'to rejoin, you must be '\
@@ -63,8 +63,3 @@ class LeaveFields(object):
                 self.__rejoinAdvice = u''
         return self.__rejoinAdvice
     
-def group_admins(g):
-    admins = g.groupObj.users_with_local_role('GroupAdmin')
-    retval = [ createObject('groupserver.UserFromId', 
-                    g.groupObj, a) for a in admins ]
-    return retval
