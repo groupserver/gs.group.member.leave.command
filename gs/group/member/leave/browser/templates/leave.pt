@@ -26,7 +26,15 @@
       </dl>
     </div>
     <tal:block metal:fill-slot="body">
+      <div tal:condition="python:not(view.isMember) and not(view.status)">
+        <h1>Not a Member of <span tal:replace="view/groupInfo/name"/></h1>
+        <p>
+          You cannot leave <span tal:replace="view/groupInfo/name"/>,
+          because you are not a member.
+        </p>
+      </div>
       <form enctype="multipart/form-data"  method="post" action="."
+        tal:condition="view/isMember"
         tal:attributes="action request/URL" id="change-subscription">
         <h1 tal:content="view/label">Change Subscription to Group Name</h1>
         <tal:block define="widgets view/widgets">

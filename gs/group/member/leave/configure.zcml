@@ -8,6 +8,6 @@
     for="Products.XWFChat.interfaces.IGSGroupFolder"
     name="leave.html"
     class=".leave.LeaveForm"
-    permission="zope2.View"/>
+    permission="zope2.Public"/>
 
 </configure>
