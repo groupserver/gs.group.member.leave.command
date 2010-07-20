@@ -2,15 +2,12 @@
 from zope.component import createObject
 from zope.schema import Choice
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
-from Products.XWFCore.XWFUtils import comma_comma_and
-from Products.GSGroup.joining import GSGroupJoining, ANYONE, REQUEST, INVITE
-from Products.CustomUserFolder.userinfo import userInfo_to_anchor
+from Products.GSGroup.joining import GSGroupJoining
 
 class LeaveFields(object):
     def __init__(self, groupInfo):
         self.groupInfo = groupInfo
-        self.__rejoinAdvice = self.__leaveTerm = None
-        self.__fields = self.__vocab = None
+        self.__leaveTerm = self.__fields = self.__vocab = None
     
     @property
     def fields(self):
@@ -37,29 +34,7 @@ class LeaveFields(object):
     @property
     def leaveTerm(self):
         if self.__leaveTerm == None:
-            title = u'Leave %s (%s)' % (self.groupInfo.name, self.rejoinAdvice)
+            rejoinAdvice = GSGroupJoining(self.groupInfo.groupObj).rejoin_advice
+            title = u'Leave %s (%s)' % (self.groupInfo.name, rejoinAdvice)
             self.__leaveTerm = SimpleTerm('leave', 'leave',  title)
         return self.__leaveTerm
-    
-    @property
-    def rejoinAdvice(self):
-        if self.__rejoinAdvice == None:
-            joinability = GSGroupJoining(self.groupInfo.groupObj).joinability
-            if joinability == ANYONE:
-                self.__rejoinAdvice = u'you can rejoin at any time'
-            elif joinability == REQUEST:
-                admins = self.groupInfo.group_admins
-                #self.__rejoinAdvice = u'to rejoin, you must be '\
-                #  u'invited by %s' % comma_comma_and([userInfo_to_anchor(a) for a in admins], conj='or')
-                self.__rejoinAdvice = u'to rejoin, you can apply to '\
-                  u'%s at any time' % comma_comma_and([userInfo_to_anchor(a) for a in admins])
-            elif joinability == INVITE:
-                admins = self.groupInfo.group_admins
-                #self.__rejoinAdvice = u'to rejoin, you must be '\
-                #  u'invited by %s' % comma_comma_and([userInfo_to_anchor(a) for a in admins], conj='or')
-                self.__rejoinAdvice = u'to rejoin, you must be '\
-                  u'invited by %s' % comma_comma_and([userInfo_to_anchor(a) for a in admins])
-            else:
-                self.__rejoinAdvice = u''
-        return self.__rejoinAdvice
-    

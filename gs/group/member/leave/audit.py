@@ -122,14 +122,14 @@ class LeaveEvent(BasicAuditEvent):
 class LeaveAuditor(object):
     """An Auditor for leaving
     """
-    def __init__(self, context, instanceUserInfo):
+    def __init__(self, context, instanceUserInfo, groupInfo=None):
         """Create a leaving auditor.
         """
         self.context = context
         self.instanceUserInfo = instanceUserInfo
         self.__userInfo = None
         self.__siteInfo = None
-        self.__groupInfo = None
+        self.__groupInfo = groupInfo
         self.__factory = None
         self.__queries = None
         

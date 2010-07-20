@@ -9,14 +9,15 @@ from zope.formlib import form
 from zope.formlib.form import Fields
 from zope.component import createObject
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
-from Products.XWFCore.XWFUtils import getOption
 from Products.GSContent.interfaces import IGSSiteInfo
 from gs.profile.notify.interfaces import IGSNotifyUser
+from Products.GSGroup.groupInfo import GSGroupInfo
 from Products.GSGroup.interfaces import IGSGroupInfo
 from Products.GSGroup.changebasicprivacy import radio_widget
-from Products.GSGroupMember.groupmembership import user_member_of_group, member_id
+from gs.group.member.leave.leaver import GroupLeaver
 from gs.group.member.leave.fields import LeaveFields
 from gs.group.member.leave.audit import LeaveAuditor, LEAVE
+from gs.group.member.leave.interfaces import IGSLeaveForm
 
 class LeaveForm(PageForm):
     pageTemplateFileName = 'browser/templates/leave.pt'
@@ -24,13 +25,29 @@ class LeaveForm(PageForm):
     
     def __init__(self, context, request):
         PageForm.__init__(self, context, request)
+        self.context = context
         self.siteInfo = IGSSiteInfo(context)
-        self.groupInfo = IGSGroupInfo(context)
-        self.label = u'Change Subscription to %s' % (self.groupInfo.name)
+        groupId = request.form['groupId']
+        self.groupInfo = GSGroupInfo(context, groupId)
         self.leaveFields = LeaveFields(self.groupInfo)
         self.form_fields = Fields(self.leaveFields.fields)
         self.form_fields['changeSubscription'].custom_widget = radio_widget
-        
+
+    @property
+    def userInfo(self):
+        return createObject('groupserver.LoggedInUser', self.context)
+
+    @property
+    def groupLeaver(self):
+        return GroupLeaver(self.userInfo, self.groupInfo)
+
+    @property
+    def label(self):
+        retval = u'Left Group'
+        if self.groupLeaver:
+            retval = u'Change Subscription to %s' % (self.groupInfo.name)
+        return retval
+    
     def setUpWidgets(self, ignore_request=False):
         self.widgets = form.setUpWidgets(
             self.form_fields, self.prefix, self.context,
@@ -38,19 +55,11 @@ class LeaveForm(PageForm):
             ignore_request=ignore_request)
         self.widgets['changeSubscription']._displayItemForMissingValue = False
     
-    @property
-    def userInfo(self):
-        return createObject('groupserver.LoggedInUser', self.groupInfo.groupObj)
-    
-    @property
-    def isMember(self):
-        return user_member_of_group(self.userInfo, self.groupInfo)
-    
     @form.action(label=u'Change', failure='handle_change_action_failure')
     def handle_change(self, action, data):
         change = data['changeSubscription']
         if change == 'leave':
-            status = self.removeUser()
+            status = self.groupLeaver.removeUser()
         else:
             status = self.setDelivery(change)
         self.status = status
@@ -69,42 +78,12 @@ class LeaveForm(PageForm):
         user = self.userInfo.user
         if change == digest:
             user.set_enableDigestByKey(self.groupInfo.id)
-            status = u'You will now receive posts from %s as a '\
-              u'digest of topics (maximum one email per day).' %\
-              self.groupInfo.name
+            status = u'The posts from %s will now be delivered '\
+              'to you in the form of a daily digest of topics.' %\
+               self.groupInfo.name
         elif change == web:
             user.set_disableDeliveryByKey(self.groupInfo.id)
-            status = u'You will no longer receive posts from %s '\
-              u'via email.' % self.groupInfo.name
+            status = u'You will not receive any posts from %s.' %\
+              self.groupInfo.name
         return status
     
-    def removeUser(self):
-        usergroupName = member_id(self.groupInfo.id)
-        self.userInfo.user.del_groupWithNotification(usergroupName)
-        if self.isMember:
-            self.errors = True
-            status = u'Oops! Something went wrong. Please try again.'
-        else:
-            auditor = LeaveAuditor(self.groupInfo.groupObj, self.userInfo)
-            auditor.info(LEAVE)
-            ptnCoach = self.groupInfo.ptn_coach
-            if ptnCoach and ptnCoach.id!=self.userInfo.id: #Unlikely, but possible
-                notifyPtn = IGSNotifyUser(ptnCoach)
-                nDict = {
-                  'siteInfo'      : self.siteInfo,  # These three info classes are
-                  'groupInfo'     : self.groupInfo, # enough, but it will take time
-                  'userInfo'      : self.userInfo,  # to change the notifications. 
-                  'groupId'       : self.groupInfo.id,
-                  'groupName'     : self.groupInfo.name,
-                  'siteName'      : self.siteInfo.name,
-                  'canonical'     : getOption(self.groupInfo.groupObj, 'canonicalHost'),
-                  'supportEmail'  : getOption(self.siteInfo.siteObj, 'supportEmail'),
-                  'memberId'      : self.userInfo.id,
-                  'memberName'    : self.userInfo.name
-                }
-                notifyPtn.send_notification('leave_group_admin', self.groupInfo.id, nDict)
-            rejoinAdvice = self.leaveFields.rejoinAdvice[0].upper() + self.leaveFields.rejoinAdvice[1:] 
-            status = u'You have left %s. %s.' % (self.groupInfo.name, rejoinAdvice)
-        return status
-
-        

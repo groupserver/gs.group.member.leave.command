@@ -5,7 +5,7 @@
   i18n_domain="groupserver">
 
   <browser:page 
-    for="Products.XWFChat.interfaces.IGSGroupFolder"
+    for="Products.GSContent.interfaces.IGSGroupsFolder"
     name="leave.html"
     class=".leave.LeaveForm"
     permission="zope2.Public"/>
