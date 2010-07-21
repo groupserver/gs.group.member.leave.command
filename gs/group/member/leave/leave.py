@@ -17,7 +17,6 @@ from Products.GSGroup.changebasicprivacy import radio_widget
 from gs.group.member.leave.leaver import GroupLeaver
 from gs.group.member.leave.fields import LeaveFields
 from gs.group.member.leave.audit import LeaveAuditor, LEAVE
-from gs.group.member.leave.interfaces import IGSLeaveForm
 
 class LeaveForm(PageForm):
     pageTemplateFileName = 'browser/templates/leave.pt'
