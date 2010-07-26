@@ -15,8 +15,7 @@ import logging
 log = logging.getLogger(SUBSYSTEM) #@UndefinedVariable
 
 UNKNOWN        = '0'  # Unknown is always "0"
-REMOVE         = '1'
-LEAVE          = '2'
+LEAVE          = '1'
 
 class LeaveAuditEventFactory(object):
     """A Factory for group leaving events.
@@ -33,12 +32,9 @@ class LeaveAuditEventFactory(object):
         """
         assert subsystem == SUBSYSTEM, 'Subsystems do not match'
 
-        if (code == REMOVE):
-            event = RemoveEvent(context, event_id, date, 
-              userInfo, instanceUserInfo, siteInfo, groupInfo)
-        elif (code == LEAVE):
+        if (code == LEAVE):
             event = LeaveEvent(context, event_id, date, 
-              instanceUserInfo, siteInfo, groupInfo)
+              userInfo, instanceUserInfo, siteInfo, groupInfo)
         else:
             event = BasicAuditEvent(context, event_id, UNKNOWN, date, 
               userInfo, instanceUserInfo, siteInfo, groupInfo, 
@@ -49,7 +45,7 @@ class LeaveAuditEventFactory(object):
     def getInterfaces(self):
         return implementedBy(BasicAuditEvent)
 
-class RemoveEvent(BasicAuditEvent):
+class LeaveEvent(BasicAuditEvent):
     ''' An audit-trail event representing a user being removed
         from a group
     '''
@@ -57,52 +53,30 @@ class RemoveEvent(BasicAuditEvent):
 
     def __init__(self, context, id, d, userInfo, instanceUserInfo, 
                   siteInfo, groupInfo):
-        """Create a removal event
+        """Create a leave event
         """
-        BasicAuditEvent.__init__(self, context, id,  REMOVE, d, userInfo,
+        BasicAuditEvent.__init__(self, context, id,  LEAVE, d, userInfo,
           instanceUserInfo, siteInfo, groupInfo, None, None, SUBSYSTEM)
-          
-    def __str__(self):
-        retval = u'%s (%s) was removed from %s (%s) on %s (%s) by %s (%s).' % (
-            self.instanceUserInfo.name, self.instanceUserInfo.id,
-            self.groupInfo.name,        self.groupInfo.id,
-            self.siteInfo.name,         self.siteInfo.id,
-            self.userInfo.name,         self.userInfo.id)
-        return retval
     
     @property
-    def xhtml(self):
-        cssClass = u'audit-event groupserver-group-member-%s' %\
-          self.code
-        retval = u'<span class="%s">Removed from %s</span>'%\
-          (cssClass, self.groupInfo.name)
-        
-        if self.instanceUserInfo.id != self.userInfo.id:
-            retval = u'%s &#8212; %s' %\
-              (retval, userInfo_to_anchor(self.userInfo))              
-        retval = u'%s (%s)' % \
-          (retval, munge_date(self.context, self.date))
+    def adminRemoved(self):
+        retval = False
+        if self.userInfo.id != self.instanceUserInfo.id:
+            retval = True
         return retval
-
-class LeaveEvent(BasicAuditEvent):
-    ''' An audit-trail event representing a user leaving
-        a group voluntarily
-    '''
-    implements(IAuditEvent)
-
-    def __init__(self, context, id, d, instanceUserInfo, 
-                  siteInfo, groupInfo):
-        """Create a removal event
-        """
-        BasicAuditEvent.__init__(self, context, id,  LEAVE, d, 
-          instanceUserInfo, instanceUserInfo, siteInfo, 
-          groupInfo, None, None, SUBSYSTEM)
           
     def __str__(self):
-        retval = u'%s (%s) left %s (%s) on %s (%s).' % (
-            self.instanceUserInfo.name, self.instanceUserInfo.id,
-            self.groupInfo.name,        self.groupInfo.id,
-            self.siteInfo.name,         self.siteInfo.id)
+        if self.adminRemoved:
+            retval = u'%s (%s) was removed from %s (%s) on %s (%s) by %s (%s).' % (
+                self.instanceUserInfo.name, self.instanceUserInfo.id,
+                self.groupInfo.name,        self.groupInfo.id,
+                self.siteInfo.name,         self.siteInfo.id,
+                self.userInfo.name,         self.userInfo.id)
+        else:
+            retval = u'%s (%s) left %s (%s) on %s (%s).' % (
+                self.instanceUserInfo.name, self.instanceUserInfo.id,
+                self.groupInfo.name,        self.groupInfo.id,
+                self.siteInfo.name,         self.siteInfo.id)
         return retval
     
     @property
@@ -112,8 +86,8 @@ class LeaveEvent(BasicAuditEvent):
         retval = u'<span class="%s">Left %s</span>'%\
           (cssClass, self.groupInfo.name)
         
-        if self.instanceUserInfo.id != self.userInfo.id:
-            retval = u'%s &#8212; %s' %\
+        if self.adminRemoved:
+            retval = u'%s &#8212; removed by %s' %\
               (retval, userInfo_to_anchor(self.userInfo))              
         retval = u'%s (%s)' % \
           (retval, munge_date(self.context, self.date))
