@@ -4,16 +4,16 @@ try:
     from five.formlib.formbase import PageForm
 except ImportError:
     from Products.Five.formlib.formbase import PageForm
-
 from zope.formlib import form
 from zope.formlib.form import Fields
 from zope.component import createObject
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
 from Products.GSContent.interfaces import IGSSiteInfo
 from gs.profile.notify.interfaces import IGSNotifyUser
+from Products.GSGroup.changebasicprivacy import radio_widget
 from Products.GSGroup.groupInfo import GSGroupInfo
 from Products.GSGroup.interfaces import IGSGroupInfo
-from Products.GSGroup.changebasicprivacy import radio_widget
+from Products.GSGroup.joining import GSGroupJoining
 from gs.group.member.leave.leaver import GroupLeaver
 from gs.group.member.leave.fields import LeaveFields
 from gs.group.member.leave.audit import LeaveAuditor, LEAVE
@@ -58,7 +58,7 @@ class LeaveForm(PageForm):
     def handle_change(self, action, data):
         change = data['changeSubscription']
         if change == 'leave':
-            status = self.groupLeaver.removeUser()
+            status = self.leaveGroup()
         else:
             status = self.setDelivery(change)
         self.status = status
@@ -68,6 +68,17 @@ class LeaveForm(PageForm):
             self.status = u'<p>There is an error:</p>'
         else:
             self.status = u'<p>There are errors:</p>'
+    
+    def leaveGroup(self):
+        rejoinAdvice = GSGroupJoining(self.groupInfo.groupObj).rejoin_advice
+        rejoinAdvice = rejoinAdvice[0].upper() + rejoinAdvice[1:]
+        success = u'You have left %s. %s.' % (self.groupInfo.name, rejoinAdvice)
+        failure = u'Oops! Something went wrong. Please try again.'
+        self.groupLeaver.removeMember()
+        retval = self.groupLeaver.isMember and failure or success
+        if retval == failure:
+            self.errors = True
+        return retval
     
     def setDelivery(self, change):
         web = 'web'
@@ -82,7 +93,8 @@ class LeaveForm(PageForm):
                self.groupInfo.name
         elif change == web:
             user.set_disableDeliveryByKey(self.groupInfo.id)
-            status = u'You will not receive any posts from %s.' %\
+            status = u'You will no longer receive any posts from %s via email.' %\
               self.groupInfo.name
         return status
+    
     
