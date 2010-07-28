@@ -38,7 +38,7 @@ class LeaveForm(PageForm):
 
     @property
     def groupLeaver(self):
-        return GroupLeaver(self.userInfo, self.groupInfo)
+        return GroupLeaver(self.groupInfo, self.userInfo)
 
     @property
     def label(self):

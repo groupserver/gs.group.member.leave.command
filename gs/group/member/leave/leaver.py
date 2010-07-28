@@ -9,10 +9,9 @@ from gs.group.member.manage.utils import removeAllPositions
 from gs.group.member.leave.audit import LeaveAuditor, LEAVE
 
 class GroupLeaver(object):
-    def __init__(self, userInfo, groupInfo):
-        self.userInfo = userInfo
+    def __init__(self, groupInfo, userInfo):
         self.groupInfo = groupInfo
-        self.siteInfo = groupInfo.siteInfo
+        self.userInfo = userInfo
 
     def __bool__(self):
         return bool(self.isMember)
@@ -25,27 +24,31 @@ class GroupLeaver(object):
         return user_member_of_group(self.userInfo, self.groupInfo)
     
     def removeMember(self):
+        retval = []
         removingUserInfo = createObject('groupserver.LoggedInUser', self.groupInfo.groupObj)
         adminsToNotify, nDict = self.adminNotification()
         gId = self.groupInfo.id
         usergroupName = member_id(gId)
         self.userInfo.user.del_groupWithNotification(usergroupName)
         if not self.isMember:
-            removeAllPositions(self.groupInfo, self.userInfo)
+            retval = removeAllPositions(self.groupInfo, self.userInfo)
             auditor = LeaveAuditor(self.groupInfo.groupObj, self.userInfo, self.groupInfo)
             auditor.info(LEAVE)
             for admin in adminsToNotify:
                 admin.send_notification('leave_group_admin', gId, nDict)
+            retval.append('removed from the group')
+        return retval
 
     def adminNotification(self):
+        siteInfo = groupInfo.siteInfo
         admins = [ IGSNotifyUser(a) for a in self.groupInfo.group_admins ]
         nDict = {
-          'siteInfo'      : self.siteInfo,  # These three info classes are
+          'siteInfo'      : siteInfo,  # These three info classes are
           'groupInfo'     : self.groupInfo, # enough, but it will take time
           'userInfo'      : self.userInfo,  # to change the notifications. 
           'groupId'       : self.groupInfo.id,
           'groupName'     : self.groupInfo.name,
-          'siteName'      : self.siteInfo.name,
+          'siteName'      : siteInfo.name,
           'canonical'     : getOption(self.groupInfo.groupObj, 'canonicalHost'),
           'supportEmail'  : getOption(self.siteInfo.siteObj, 'supportEmail'),
           'memberId'      : self.userInfo.id,
@@ -53,4 +56,3 @@ class GroupLeaver(object):
         }
         retval = (admins, nDict)
         return retval
-        
