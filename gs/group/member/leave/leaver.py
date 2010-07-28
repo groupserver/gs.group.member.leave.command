@@ -25,6 +25,8 @@ class GroupLeaver(object):
     
     def removeMember(self):
         retval = []
+        if not self.isMember:
+            return retval
         removingUserInfo = createObject('groupserver.LoggedInUser', self.groupInfo.groupObj)
         adminsToNotify, nDict = self.adminNotification()
         gId = self.groupInfo.id
@@ -40,19 +42,12 @@ class GroupLeaver(object):
         return retval
 
     def adminNotification(self):
-        siteInfo = groupInfo.siteInfo
+        siteInfo = self.groupInfo.siteInfo
         admins = [ IGSNotifyUser(a) for a in self.groupInfo.group_admins ]
         nDict = {
-          'siteInfo'      : siteInfo,  # These three info classes are
-          'groupInfo'     : self.groupInfo, # enough, but it will take time
-          'userInfo'      : self.userInfo,  # to change the notifications. 
-          'groupId'       : self.groupInfo.id,
-          'groupName'     : self.groupInfo.name,
-          'siteName'      : siteInfo.name,
-          'canonical'     : getOption(self.groupInfo.groupObj, 'canonicalHost'),
-          'supportEmail'  : getOption(self.siteInfo.siteObj, 'supportEmail'),
-          'memberId'      : self.userInfo.id,
-          'memberName'    : self.userInfo.name
+          'siteInfo'      : siteInfo,
+          'groupInfo'     : self.groupInfo,
+          'userInfo'      : self.userInfo 
         }
         retval = (admins, nDict)
         return retval

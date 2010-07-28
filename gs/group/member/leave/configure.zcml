@@ -10,4 +10,9 @@
     class=".leave.LeaveForm"
     permission="zope2.Public"/>
 
+  <utility 
+    factory=".audit.LeaveAuditEventFactory"
+    name="gs.group.member.leave"
+    permission="zope.Public" />
+
 </configure>
