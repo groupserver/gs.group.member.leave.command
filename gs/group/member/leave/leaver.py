@@ -2,8 +2,6 @@
 '''The code that removes a group member from the group'''
 from zope.component import createObject
 from gs.profile.notify.interfaces import IGSNotifyUser
-from Products.XWFCore.XWFUtils import getOption
-from Products.GSGroup.utils import is_secret
 from gs.group.member.base.utils import user_member_of_group, member_id
 from gs.group.member.manage.utils import removeAllPositions
 from gs.group.member.leave.audit import LeaveAuditor, LEAVE
@@ -27,7 +25,6 @@ class GroupLeaver(object):
         retval = []
         if not self.isMember:
             return retval
-        removingUserInfo = createObject('groupserver.LoggedInUser', self.groupInfo.groupObj)
         adminsToNotify, nDict = self.adminNotification()
         gId = self.groupInfo.id
         usergroupName = member_id(gId)
