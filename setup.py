@@ -25,7 +25,7 @@ setup(name='gs.group.member.leave',
     zip_safe=False,
     install_requires=[
         'setuptools',
-        'Products.XWFCore.XWFUtils',
+        'Products.XWFCore',
         'Products.CustomUserFolder',
         'Products.GSContent',
         'Products.GSAuditTrail',
