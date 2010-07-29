@@ -26,8 +26,8 @@ class LeaveFields(object):
     def vocab(self):
         retval = SimpleVocabulary([
           self.leaveTerm,
-          SimpleTerm('web',   'web',    u'Read posts on the web (no email)'),
-          SimpleTerm('digest','digest', u'Receive a digest of topics '\
+          SimpleTerm('web', 'web', u'Read posts on the web (no email)'),
+          SimpleTerm('digest', 'digest', u'Receive a digest of topics '\
             u'(maximum one email per day)')])
         return retval
     
@@ -36,5 +36,5 @@ class LeaveFields(object):
         if self.__leaveTerm == None:
             rejoinAdvice = GSGroupJoining(self.groupInfo.groupObj).rejoin_advice
             title = u'Leave %s (%s)' % (self.groupInfo.name, rejoinAdvice)
-            self.__leaveTerm = SimpleTerm('leave', 'leave',  title)
+            self.__leaveTerm = SimpleTerm('leave', 'leave', title)
         return self.__leaveTerm

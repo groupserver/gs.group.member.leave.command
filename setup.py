@@ -25,6 +25,13 @@ setup(name='gs.group.member.leave',
     zip_safe=False,
     install_requires=[
         'setuptools',
+        'Products.XWFCore.XWFUtils',
+        'Products.CustomUserFolder',
+        'Products.GSContent',
+        'Products.GSAuditTrail',
+        'Products.GSGroup',
+        'gs.profile.notify',
+        'gs.group.member.leave'
         # -*- Extra requirements: -*-
     ],
     entry_points="""

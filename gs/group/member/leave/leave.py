@@ -9,14 +9,11 @@ from zope.formlib.form import Fields
 from zope.component import createObject
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
 from Products.GSContent.interfaces import IGSSiteInfo
-from gs.profile.notify.interfaces import IGSNotifyUser
 from Products.GSGroup.changebasicprivacy import radio_widget
 from Products.GSGroup.groupInfo import GSGroupInfo
-from Products.GSGroup.interfaces import IGSGroupInfo
 from Products.GSGroup.joining import GSGroupJoining
 from gs.group.member.leave.leaver import GroupLeaver
 from gs.group.member.leave.fields import LeaveFields
-from gs.group.member.leave.audit import LeaveAuditor, LEAVE
 
 class LeaveForm(PageForm):
     pageTemplateFileName = 'browser/templates/leave.pt'
@@ -89,11 +86,11 @@ class LeaveForm(PageForm):
         if change == digest:
             user.set_enableDigestByKey(self.groupInfo.id)
             status = u'The posts from %s will now be delivered '\
-              'to you in the form of a daily digest of topics.' %\
+              'to you in the form of a daily digest of topics.' % \
                self.groupInfo.name
         elif change == web:
             user.set_disableDeliveryByKey(self.groupInfo.id)
-            status = u'You will no longer receive any posts from %s via email.' %\
+            status = u'You will no longer receive any posts from %s via email.' % \
               self.groupInfo.name
         return status
     

@@ -6,7 +6,6 @@ from zope.component.interfaces import IFactory
 from zope.interface import implements, implementedBy
 from Products.XWFCore.XWFUtils import munge_date
 from Products.CustomUserFolder.userinfo import userInfo_to_anchor
-from Products.CustomUserFolder.interfaces import IGSUserInfo
 from Products.GSAuditTrail import IAuditEvent, BasicAuditEvent, AuditQuery
 from Products.GSAuditTrail.utils import event_id_from_data
 
@@ -14,16 +13,16 @@ SUBSYSTEM = 'gs.group.member.leave'
 import logging
 log = logging.getLogger(SUBSYSTEM) #@UndefinedVariable
 
-UNKNOWN        = '0'  # Unknown is always "0"
-LEAVE          = '1'
+UNKNOWN = '0'  # Unknown is always "0"
+LEAVE   = '1'
 
 class LeaveAuditEventFactory(object):
     """A Factory for group leaving events.
     """
     implements(IFactory)
 
-    title=u'GroupServer Leave Group Audit Event Factory'
-    description=u'Creates a GroupServer event auditor for leaving groups'
+    title = u'GroupServer Leave Group Audit Event Factory'
+    description = u'Creates a GroupServer event auditor for leaving groups'
 
     def __call__(self, context, event_id, code, date,
         userInfo, instanceUserInfo, siteInfo, groupInfo,
@@ -33,11 +32,11 @@ class LeaveAuditEventFactory(object):
         assert subsystem == SUBSYSTEM, 'Subsystems do not match'
 
         if (code == LEAVE):
-            event = LeaveEvent(context, event_id, date, 
+            event = LeaveEvent(context, event_id, date,
               userInfo, instanceUserInfo, siteInfo, groupInfo)
         else:
-            event = BasicAuditEvent(context, event_id, UNKNOWN, date, 
-              userInfo, instanceUserInfo, siteInfo, groupInfo, 
+            event = BasicAuditEvent(context, event_id, UNKNOWN, date,
+              userInfo, instanceUserInfo, siteInfo, groupInfo,
               instanceDatum, supplementaryDatum, SUBSYSTEM)
         assert event
         return event
@@ -51,11 +50,11 @@ class LeaveEvent(BasicAuditEvent):
     '''
     implements(IAuditEvent)
 
-    def __init__(self, context, id, d, userInfo, instanceUserInfo, 
+    def __init__(self, context, id, d, userInfo, instanceUserInfo,
                   siteInfo, groupInfo):
         """Create a leave event
         """
-        BasicAuditEvent.__init__(self, context, id,  LEAVE, d, userInfo,
+        BasicAuditEvent.__init__(self, context, id, LEAVE, d, userInfo,
           instanceUserInfo, siteInfo, groupInfo, None, None, SUBSYSTEM)
     
     @property
@@ -69,25 +68,25 @@ class LeaveEvent(BasicAuditEvent):
         if self.adminRemoved:
             retval = u'%s (%s) was removed from %s (%s) on %s (%s) by %s (%s).' % (
                 self.instanceUserInfo.name, self.instanceUserInfo.id,
-                self.groupInfo.name,        self.groupInfo.id,
-                self.siteInfo.name,         self.siteInfo.id,
-                self.userInfo.name,         self.userInfo.id)
+                self.groupInfo.name, self.groupInfo.id,
+                self.siteInfo.name, self.siteInfo.id,
+                self.userInfo.name, self.userInfo.id)
         else:
             retval = u'%s (%s) left %s (%s) on %s (%s).' % (
                 self.instanceUserInfo.name, self.instanceUserInfo.id,
-                self.groupInfo.name,        self.groupInfo.id,
-                self.siteInfo.name,         self.siteInfo.id)
+                self.groupInfo.name, self.groupInfo.id,
+                self.siteInfo.name, self.siteInfo.id)
         return retval
     
     @property
     def xhtml(self):
-        cssClass = u'audit-event groupserver-group-member-%s' %\
+        cssClass = u'audit-event groupserver-group-member-%s' % \
           self.code
-        retval = u'<span class="%s">Left %s</span>'%\
+        retval = u'<span class="%s">Left %s</span>' % \
           (cssClass, self.groupInfo.name)
         
         if self.adminRemoved:
-            retval = u'%s &#8212; removed by %s' %\
+            retval = u'%s &#8212; removed by %s' % \
               (retval, userInfo_to_anchor(self.userInfo))              
         retval = u'%s (%s)' % \
           (retval, munge_date(self.context, self.date))
@@ -110,21 +109,21 @@ class LeaveAuditor(object):
     @property
     def userInfo(self):
         if self.__userInfo == None:
-            self.__userInfo =\
+            self.__userInfo = \
               createObject('groupserver.LoggedInUser', self.context)
         return self.__userInfo
         
     @property
     def siteInfo(self):
         if self.__siteInfo == None:
-            self.__siteInfo =\
+            self.__siteInfo = \
               createObject('groupserver.SiteInfo', self.context)
         return self.__siteInfo
         
     @property
     def groupInfo(self):
         if self.__groupInfo == None:
-            self.__groupInfo =\
+            self.__groupInfo = \
               createObject('groupserver.GroupInfo', self.context)
         return self.__groupInfo
         
@@ -147,12 +146,12 @@ class LeaveAuditor(object):
             * Writes the event to the standard Python log.
         """
         d = datetime.now(UTC)
-        eventId = event_id_from_data(self.userInfo, 
+        eventId = event_id_from_data(self.userInfo,
           self.instanceUserInfo, self.siteInfo, code, instanceDatum,
           '%s-%s' % (self.groupInfo.name, self.groupInfo.id))
           
-        e = self.factory(self.context, eventId,  code, d,
-          self.userInfo, self.instanceUserInfo, self.siteInfo, 
+        e = self.factory(self.context, eventId, code, d,
+          self.userInfo, self.instanceUserInfo, self.siteInfo,
           self.groupInfo, instanceDatum, None, SUBSYSTEM)
           
         self.queries.store(e)
