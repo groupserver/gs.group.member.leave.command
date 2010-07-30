@@ -6,6 +6,7 @@ from zope.component.interfaces import IFactory
 from zope.interface import implements, implementedBy
 from Products.XWFCore.XWFUtils import munge_date
 from Products.CustomUserFolder.userinfo import userInfo_to_anchor
+from Products.GSGroup.groupInfo import groupInfo_to_anchor
 from Products.GSAuditTrail import IAuditEvent, BasicAuditEvent, AuditQuery
 from Products.GSAuditTrail.utils import event_id_from_data
 
@@ -84,7 +85,7 @@ class LeaveEvent(BasicAuditEvent):
         cssClass = u'audit-event groupserver-group-member-%s' % \
           self.code
         retval = u'<span class="%s">Left %s</span>' % \
-          (cssClass, self.groupInfo.name)
+          (cssClass, groupInfo_to_anchor(self.groupInfo))
         
         if self.adminRemoved:
             retval = u'%s &#8212; removed by %s' % \
