@@ -31,6 +31,7 @@ setup(name='gs.group.member.leave',
         'Products.GSAuditTrail',
         'Products.GSGroup',
         'gs.profile.notify',
+        'gs.group.member.base',
         'gs.group.member.manage'
         # -*- Extra requirements: -*-
     ],
