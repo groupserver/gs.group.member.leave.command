@@ -28,9 +28,9 @@ class GroupLeaver(object):
         adminsToNotify, nDict = self.adminNotification()
         gId = self.groupInfo.id
         usergroupName = member_id(gId)
+        retval = removeAllPositions(self.groupInfo, self.userInfo)
         self.userInfo.user.del_groupWithNotification(usergroupName)
         if not self.isMember:
-            retval = removeAllPositions(self.groupInfo, self.userInfo)
             auditor = LeaveAuditor(self.groupInfo.groupObj, self.userInfo, self.groupInfo)
             auditor.info(LEAVE)
             for admin in adminsToNotify:
