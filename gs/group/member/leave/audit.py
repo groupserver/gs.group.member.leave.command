@@ -61,7 +61,7 @@ class LeaveEvent(BasicAuditEvent):
     @property
     def adminRemoved(self):
         retval = False
-        if self.userInfo.id != self.instanceUserInfo.id:
+        if self.userInfo.id and self.userInfo.id!= self.instanceUserInfo.id:
             retval = True
         return retval
           

@@ -40,7 +40,8 @@ class GroupLeaver(object):
 
     def adminNotification(self):
         siteInfo = self.groupInfo.siteInfo
-        admins = [ IGSNotifyUser(a) for a in self.groupInfo.group_admins ]
+        admins = [ IGSNotifyUser(a) for a in self.groupInfo.group_admins 
+                  if a.id != self.userInfo.id ]
         nDict = {
           'siteInfo'      : siteInfo,
           'groupInfo'     : self.groupInfo,
