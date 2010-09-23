@@ -1,9 +1,11 @@
 # coding=utf-8
 '''The code that removes a group member from the group'''
 from zope.component import createObject
+from Products.GSGroupMember.groupMembersInfo import GSGroupMembersInfo
+from Products.GSGroupMember.groupmembershipstatus import GSGroupMembershipStatus
 from gs.profile.notify.interfaces import IGSNotifyUser
-from gs.group.member.base.utils import user_member_of_group, member_id
-from gs.group.member.manage.utils import removeAllPositions
+from gs.group.member.base.utils import member_id
+from gs.group.member.leave.utils import removeAllPositions
 from gs.group.member.leave.audit import LeaveAuditor, LEAVE
 
 class GroupLeaver(object):
@@ -19,7 +21,9 @@ class GroupLeaver(object):
 
     @property
     def isMember(self):
-        return user_member_of_group(self.userInfo, self.groupInfo)
+        membersInfo = GSGroupMembersInfo(self.groupInfo.groupObj)
+        status = GSGroupMembershipStatus(self.userInfo, membersInfo)
+        return status
     
     def removeMember(self):
         retval = []
