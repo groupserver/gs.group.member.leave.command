@@ -9,7 +9,7 @@ from zope.formlib.form import Fields
 from zope.component import createObject
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
 from Products.GSContent.interfaces import IGSSiteInfo
-from Products.GSGroup.changebasicprivacy import radio_widget
+from gs.content.form.radio import radio_widget
 from Products.GSGroup.groupInfo import GSGroupInfo
 from Products.GSGroup.joining import GSGroupJoining
 from gs.group.member.leave.leaver import GroupLeaver
