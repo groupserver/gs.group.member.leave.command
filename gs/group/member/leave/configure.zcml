@@ -15,4 +15,12 @@
     name="gs.group.member.leave"
     permission="zope.Public" />
 
+  <browser:viewlet name="gs-group-member-leave"
+    manager="gs.group.home.interfaces.IGroupHomepageUsLinks"
+    template="browser/templates/leave_link.pt"
+    class=".leavelink.LeaveLinkViewlet"
+    permission="zope2.View"
+    weight="1"
+    title="Leave" />
+
 </configure>
