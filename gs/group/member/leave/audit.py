@@ -84,14 +84,17 @@ class LeaveEvent(BasicAuditEvent):
     def xhtml(self):
         cssClass = u'audit-event groupserver-group-member-%s' % \
           self.code
-        retval = u'<span class="%s">Left %s</span>' % \
-          (cssClass, groupInfo_to_anchor(self.groupInfo))
+        retval = ''
+        # --=mpj17=-- Sometimes this is false. I do not know why.
+        if self.groupInfo.id: 
+            retval = u'<span class="%s">Left %s</span>' % \
+                (cssClass, groupInfo_to_anchor(self.groupInfo))
         
-        if self.adminRemoved:
-            retval = u'%s &#8212; removed by %s' % \
-              (retval, userInfo_to_anchor(self.userInfo))              
-        retval = u'%s (%s)' % \
-          (retval, munge_date(self.context, self.date))
+            if self.adminRemoved:
+                retval = u'%s &#8212; removed by %s' % \
+                            (retval, userInfo_to_anchor(self.userInfo))              
+                retval = u'%s (%s)' % \
+                          (retval, munge_date(self.context, self.date))
         return retval
 
 class LeaveAuditor(object):
