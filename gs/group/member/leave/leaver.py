@@ -11,8 +11,7 @@ from gs.group.member.leave.audit import LeaveAuditor, LEAVE
 from event import GSLeaveGroupEvent
 
 class GroupLeaver(object):
-    def __init__(self, context, groupInfo, userInfo):
-        self.context = context
+    def __init__(self, groupInfo, userInfo):
         self.groupInfo = groupInfo
         self.userInfo = userInfo
 

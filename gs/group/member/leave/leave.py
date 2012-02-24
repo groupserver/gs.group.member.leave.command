@@ -33,7 +33,7 @@ class LeaveForm(SiteForm):
 
     @Lazy
     def groupLeaver(self):
-        return GroupLeaver(self.context, self.groupInfo, self.loggedInUser)
+        return GroupLeaver(self.groupInfo, self.loggedInUser)
 
     @Lazy
     def label(self):
