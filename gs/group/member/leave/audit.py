@@ -141,7 +141,7 @@ class LeaveAuditor(object):
     @property
     def queries(self):
         if self.__queries == None:
-            self.__queries = AuditQuery(self.context.zsqlalchemy)
+            self.__queries = AuditQuery()
         return self.__queries
         
     def info(self, code, instanceDatum='', supplementaryDatum=''):
