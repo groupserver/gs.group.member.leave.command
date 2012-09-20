@@ -1,8 +1,11 @@
 # coding=utf-8
 from Products.GSGroupMember.groupMembersInfo import GSGroupMembersInfo
-from Products.GSGroupMember.groupmembershipstatus import GSGroupMembershipStatus
-from gs.group.member.manage.utils import removePtnCoach, removeAdmin, unmoderate
+from Products.GSGroupMember.groupmembershipstatus import \
+    GSGroupMembershipStatus
+from gs.group.member.manage.utils import removePtnCoach, removeAdmin,\
+    unmoderate
 from gs.group.member.manage.utils import removePostingMember, removeModerator
+
 
 def removeAllPositions(groupInfo, userInfo):
     retval = []
@@ -19,4 +22,3 @@ def removeAllPositions(groupInfo, userInfo):
     if status.isModerated:
         retval.append(unmoderate(groupInfo, userInfo))
     return retval
-
