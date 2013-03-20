@@ -1,18 +1,36 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
   xmlns:tal="http://xml.zope.org/namespaces/tal"
   xmlns:metal="http://xml.zope.org/namespaces/metal"
-  metal:use-macro="context/@@groupserver_site_home_layout/page">
+  metal:use-macro="context/@@groupserver_layout/page">
   <head>
     <title metal:fill-slot="title">
-      <span tal:replace="string:${view/label}: ${view/siteInfo/get_name}">
+      <span tal:replace="string:Leave: ${view/groupInfo/name}: ${view/siteInfo/name}">
         Change Subscription to Group Name: Site Name
       </span>
     </title>
+    <tal:block metal:fill-slot="metadata">
+      <link rel="up" href="#"
+            tal:attributes="title view/groupInfo/name;
+                            href string:${view/groupInfo/relativeURL}/"/>
+      <link rel="bookmark" title="Group Homepage" href="/"
+        tal:attributes="title string:${view/groupInfo/name} Homepage;"/>
+    </tal:block>
   </head>
   <body>
     <tal:block content="structure provider:groupserver.FormStatusMessage"
       define="errors view/errors; status view/status; widgets view/widgets"
       metal:fill-slot="messages">&#160;</tal:block>
+    <ul metal:fill-slot="breadcrumb">
+      <li><a tal:attributes="title string:${view/siteInfo/name} Homepage"
+             href="/" title="Home">&#8962;</a></li>
+      <li>
+        <a class="group" 
+           tal:attributes="href string:${view/groupInfo/relativeURL}/">
+          <strong
+            tal:content="view/groupInfo/name">This group</strong></a>
+      </li>
+      <li>Leave</li>
+    </ul>
     <tal:block metal:fill-slot="body">
       <div tal:condition="python:not(view.groupLeaver) and not(view.status)">
         <h1>Not a Member of <span tal:replace="view/groupInfo/name"/></h1>
