@@ -2,7 +2,7 @@
 '''The code that removes a group member from the group'''
 from zope.event import notify
 from gs.profile.notify.interfaces import IGSNotifyUser
-from gs.group.member.base.utils import member_id, user_member_of_group
+from gs.group.member.base import member_id, user_member_of_group
 from gs.group.member.leave.utils import removeAllPositions
 from gs.group.member.leave.audit import LeaveAuditor, LEAVE
 from event import GSLeaveGroupEvent

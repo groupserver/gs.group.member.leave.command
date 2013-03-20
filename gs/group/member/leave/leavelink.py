@@ -1,6 +1,7 @@
 # coding=utf-8
 from zope.cachedescriptors.property import Lazy
-from gs.group.member.base.viewlet import MemberViewlet
+from gs.group.member.viewlet import MemberViewlet
+
 
 class LeaveLinkViewlet(MemberViewlet):
     def __init__(self, group, request, view, manager):
@@ -10,4 +11,3 @@ class LeaveLinkViewlet(MemberViewlet):
     def show(self):
         retval = self.isMember
         return retval
-

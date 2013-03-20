@@ -17,7 +17,8 @@
 
   <!--=mpj17= Oddly, the permission for this viewlet has to be 
     - zope2.Public, or it will not be shown in Secret groups. -->
-  <browser:viewlet name="gs-group-member-leave"
+  <browser:viewlet 
+    name="gs-group-member-leave"
     manager="gs.group.home.interfaces.IGroupHomepageUsLinks"
     template="browser/templates/leave_link.pt"
     class=".leavelink.LeaveLinkViewlet"
