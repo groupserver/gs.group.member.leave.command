@@ -4,6 +4,7 @@
   xmlns:five="http://namespaces.zope.org/five"
   i18n_domain="groupserver">
 
+  <!-- Note, this is the *Groups* folder, not the Group. -->
   <browser:page 
     for="gs.groups.interfaces.IGSGroupsFolder"
     name="leave.html"
