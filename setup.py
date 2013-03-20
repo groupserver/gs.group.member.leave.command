@@ -46,7 +46,7 @@ setup(name='gs.group.member.leave',
         'gs.group.member.manage',
         'gs.profile.notify',
         'gs.group.member.base',
-        'gs.group.member.manage'
+        'gs.group.member.manage',
         'Products.GSAuditTrail',
         'Products.GSGroup',
         'Products.XWFCore',
