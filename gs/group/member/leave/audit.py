@@ -1,6 +1,7 @@
 # coding=utf-8
 from pytz import UTC
 from datetime import datetime
+from zope.cachedescriptors.property import Lazy
 from zope.component import createObject
 from zope.component.interfaces import IFactory
 from zope.interface import implements, implementedBy
@@ -12,10 +13,11 @@ from Products.GSAuditTrail.utils import event_id_from_data
 
 SUBSYSTEM = 'gs.group.member.leave'
 import logging
-log = logging.getLogger(SUBSYSTEM) #@UndefinedVariable
+log = logging.getLogger(SUBSYSTEM)
 
 UNKNOWN = '0'  # Unknown is always "0"
-LEAVE   = '1'
+LEAVE = '1'
+
 
 class LeaveAuditEventFactory(object):
     """A Factory for group leaving events.
@@ -41,9 +43,10 @@ class LeaveAuditEventFactory(object):
               instanceDatum, supplementaryDatum, SUBSYSTEM)
         assert event
         return event
-    
+
     def getInterfaces(self):
         return implementedBy(BasicAuditEvent)
+
 
 class LeaveEvent(BasicAuditEvent):
     ''' An audit-trail event representing a user being removed
@@ -57,21 +60,23 @@ class LeaveEvent(BasicAuditEvent):
         """
         BasicAuditEvent.__init__(self, context, id, LEAVE, d, userInfo,
           instanceUserInfo, siteInfo, groupInfo, None, None, SUBSYSTEM)
-    
+
     @property
     def adminRemoved(self):
         retval = False
-        if self.userInfo.id and self.userInfo.id!= self.instanceUserInfo.id:
+        if self.userInfo.id and self.userInfo.id != self.instanceUserInfo.id:
             retval = True
         return retval
-          
+
     def __str__(self):
         if self.adminRemoved:
-            retval = u'%s (%s) was removed from %s (%s) on %s (%s) by %s (%s).' % (
-                self.instanceUserInfo.name, self.instanceUserInfo.id,
-                self.groupInfo.name, self.groupInfo.id,
-                self.siteInfo.name, self.siteInfo.id,
-                self.userInfo.name, self.userInfo.id)
+            r = u'{0} ({1}) was removed from {2} ({3}) on {4} ({5}) by {6} '\
+                u'({7}).'
+            retval = r.format(self.instanceUserInfo.name,
+                        self.instanceUserInfo.id, self.groupInfo.name,
+                        self.groupInfo.id, self.siteInfo.name,
+                        self.siteInfo.id, self.userInfo.name,
+                        self.userInfo.id)
         else:
             retval = u'%s (%s) left %s (%s) on %s (%s).' % (
                 self.instanceUserInfo.name, self.instanceUserInfo.id,
@@ -79,23 +84,24 @@ class LeaveEvent(BasicAuditEvent):
                 self.siteInfo.name, self.siteInfo.id)
         retval = retval.encode('ascii', 'ignore')
         return retval
-    
+
     @property
     def xhtml(self):
         cssClass = u'audit-event groupserver-group-member-%s' % \
           self.code
         retval = ''
         # --=mpj17=-- Sometimes this is false. I do not know why.
-        if self.groupInfo.id: 
+        if self.groupInfo.id:
             retval = u'<span class="%s">Left %s</span>' % \
                 (cssClass, groupInfo_to_anchor(self.groupInfo))
-        
+
             if self.adminRemoved:
                 retval = u'%s &#8212; removed by %s' % \
-                            (retval, userInfo_to_anchor(self.userInfo))              
+                            (retval, userInfo_to_anchor(self.userInfo))
                 retval = u'%s (%s)' % \
                           (retval, munge_date(self.context, self.date))
         return retval
+
 
 class LeaveAuditor(object):
     """An Auditor for leaving
@@ -105,45 +111,34 @@ class LeaveAuditor(object):
         """
         self.context = context
         self.instanceUserInfo = instanceUserInfo
-        self.__userInfo = None
-        self.__siteInfo = None
         self.__groupInfo = groupInfo
-        self.__factory = None
-        self.__queries = None
-        
-    @property
+
+    @Lazy
     def userInfo(self):
-        if self.__userInfo == None:
-            self.__userInfo = \
-              createObject('groupserver.LoggedInUser', self.context)
-        return self.__userInfo
-        
-    @property
+        retval = createObject('groupserver.LoggedInUser', self.context)
+        return retval
+
+    @Lazy
     def siteInfo(self):
-        if self.__siteInfo == None:
-            self.__siteInfo = \
-              createObject('groupserver.SiteInfo', self.context)
-        return self.__siteInfo
-        
-    @property
+        retval = createObject('groupserver.SiteInfo', self.context)
+        return retval
+
+    @Lazy
     def groupInfo(self):
-        if self.__groupInfo == None:
-            self.__groupInfo = \
-              createObject('groupserver.GroupInfo', self.context)
-        return self.__groupInfo
-        
-    @property
+        retval = self.__groupInfo if self.__groupInfo is not None else \
+                  createObject('groupserver.GroupInfo', self.context)
+        return retval
+
+    @Lazy
     def factory(self):
-        if self.__factory == None:
-            self.__factory = LeaveAuditEventFactory()
-        return self.__factory
-        
+        retval = LeaveAuditEventFactory()
+        return retval
+
     @property
     def queries(self):
-        if self.__queries == None:
-            self.__queries = AuditQuery()
-        return self.__queries
-        
+        retval = AuditQuery()
+        return retval
+
     def info(self, code, instanceDatum='', supplementaryDatum=''):
         """Log an info event to the audit trail.
             * Creates an ID for the new event,
@@ -154,12 +149,11 @@ class LeaveAuditor(object):
         eventId = event_id_from_data(self.userInfo,
           self.instanceUserInfo, self.siteInfo, code, instanceDatum,
           '%s-%s' % (self.groupInfo.name, self.groupInfo.id))
-          
+
         e = self.factory(self.context, eventId, code, d,
           self.userInfo, self.instanceUserInfo, self.siteInfo,
           self.groupInfo, instanceDatum, None, SUBSYSTEM)
-          
+
         self.queries.store(e)
         log.info(e)
         return e
-
