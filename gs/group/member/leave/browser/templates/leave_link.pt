@@ -1,7 +1,0 @@
-<li id="gs-group-member-leave-link">
-  You are a <strong>member.</strong> You can 
-  <a href="#"
-    tal:define="url string:/groups/leave.html?groupId=${view/groupInfo/id}"
-    tal:attributes="title string:Leave ${view/groupInfo/name};
-      href url;">leave.</a></li>
-
