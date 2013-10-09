@@ -1,11 +1,24 @@
-# coding=utf-8
-'''The code that removes a group member from the group'''
+# -*- coding: utf-8 -*-
+##############################################################################
+#
+# Copyright © 2013 OnlineGroups.net and Contributors.
+# All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+from __future__ import absolute_import
 from zope.event import notify
 from gs.profile.notify.interfaces import IGSNotifyUser
 from gs.group.member.base import member_id, user_member_of_group
-from gs.group.member.leave.utils import removeAllPositions
-from gs.group.member.leave.audit import LeaveAuditor, LEAVE
-from event import GSLeaveGroupEvent
+from .audit import LeaveAuditor, LEAVE
+from .event import GSLeaveGroupEvent
+from .utils import removeAllPositions
 
 
 class GroupLeaver(object):
@@ -33,12 +46,13 @@ class GroupLeaver(object):
         gId = self.groupInfo.id
         usergroupName = member_id(gId)
         retval = removeAllPositions(self.groupInfo, self.userInfo)
-        self.userInfo.user.del_groupWithNotification(usergroupName)
+        self.userInfo.user.del_group(usergroupName)
         groupObj = self.groupInfo.groupObj
         if not self.isMember:
             auditor = LeaveAuditor(groupObj, self.userInfo, self.groupInfo)
             auditor.info(LEAVE)
             for admin in adminsToNotify:
+                # TODO: Change to a HTML-notification
                 admin.send_notification('leave_group_admin', gId, nDict)
             retval.append('removed from the group')
         notify(GSLeaveGroupEvent(groupObj, self.groupInfo, self.userInfo))
