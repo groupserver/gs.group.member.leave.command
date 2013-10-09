@@ -21,8 +21,13 @@
       define="errors view/errors; status view/status; widgets view/widgets"
       metal:fill-slot="messages">&#160;</tal:block>
     <ul metal:fill-slot="breadcrumb">
-      <li><a tal:attributes="title string:${view/siteInfo/name} Homepage"
-             href="/" title="Home">&#8962;</a></li>
+      <li class="site">
+        <a class="icon-alone" href="/"
+           tal:attributes="title string:${view/siteInfo/name} Homepage">
+          <span data-icon="⌂" aria-hidden="true"></span>
+        <span tal:content="string:${view/siteInfo/name} Homepage"
+              class="screen-reader-text">Site homepage</span></a>
+      </li>
       <li>
         <a class="group" 
            tal:attributes="href string:${view/groupInfo/relativeURL}/">
