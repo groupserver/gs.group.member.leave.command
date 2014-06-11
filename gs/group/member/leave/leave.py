@@ -1,15 +1,27 @@
-# coding=utf-8
-'''The form that allows a group member to leave a group'''
+# -*- coding: utf-8 -*-
+##############################################################################
+#
+# Copyright © 2013 OnlineGroups.net and Contributors.
+# All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+from __future__ import absolute_import
+from zope.cachedescriptors.property import Lazy
 from zope.formlib import form
 from zope.formlib.form import Fields
-from zope.cachedescriptors.property import Lazy
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
-from gs.content.form.radio import radio_widget
+from gs.content.form.base import radio_widget, SiteForm
 from Products.GSGroup.groupInfo import GSGroupInfo
 from Products.GSGroup.joining import GSGroupJoining
-from gs.content.form.form import SiteForm
-from leaver import GroupLeaver
-from fields import LeaveFields
+from .leaver import GroupLeaver
+from .fields import LeaveFields
 
 
 class LeaveForm(SiteForm):
