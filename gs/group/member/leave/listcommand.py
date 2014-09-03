@@ -17,7 +17,7 @@ from email.utils import parseaddr
 from zope.component import createObject
 from gs.group.list.command import CommandResult, CommandABC
 from Products.CustomUserFolder.interfaces import IGSUserInfo
-from .leaver import GroupLeaver
+from .utils import leave_group
 
 
 class LeaveCommand(CommandABC):
@@ -32,19 +32,13 @@ class LeaveCommand(CommandABC):
 
         retval = CommandResult.notACommand
         if (len(components) == 1):
-            self.leave(email)
+            userInfo = self.get_user(email)
+            if userInfo:
+                groupInfo = createObject('groupserver.GroupInfo',
+                                         self.group)
+                leave_group(groupInfo, userInfo, request)
             retval = CommandResult.commandStop
         return retval
-
-    def leave(self, email):
-        userInfo = self.get_user(email)
-        if userInfo:
-            groupInfo = createObject('groupserver.GroupInfo', self.group)
-            # TODO: Create a notification. This has to be done *before* the
-            #       member leaves the group, or a big fat permission denied
-            #       error will be raised.
-            leaver = GroupLeaver(groupInfo, userInfo)
-            leaver.removeMember()
 
     def get_user(self, email):
         retval = None

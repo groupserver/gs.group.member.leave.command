@@ -14,10 +14,16 @@
 ############################################################################
 from __future__ import absolute_import
 from zope.event import notify
-from gs.group.member.base import member_id, user_member_of_group
+from gs.group.member.base import (member_id, user_member_of_group)
+from gs.group.member.manage.utils import (removePtnCoach, removeAdmin,
+                                          unmoderate)
+from gs.group.member.manage.utils import (removePostingMember,
+                                          removeModerator)
+from Products.GSGroupMember.groupMembersInfo import GSGroupMembersInfo
+from Products.GSGroupMember.groupmembershipstatus import (
+    GSGroupMembershipStatus)
 from .audit import LeaveAuditor, LEAVE
 from .event import GSLeaveGroupEvent
-from .utils import removeAllPositions
 
 
 class GroupLeaver(object):
@@ -43,7 +49,7 @@ class GroupLeaver(object):
             return retval
         gId = self.groupInfo.id
         usergroupName = member_id(gId)
-        retval = removeAllPositions(self.groupInfo, self.userInfo)
+        retval = self.remove_all_positions(self.groupInfo, self.userInfo)
         self.userInfo.user.del_group(usergroupName)
         groupObj = self.groupInfo.groupObj
         if not self.isMember:
@@ -51,4 +57,21 @@ class GroupLeaver(object):
             auditor.info(LEAVE)
             retval.append('removed from the group')
         notify(GSLeaveGroupEvent(groupObj, self.groupInfo, self.userInfo))
+        return retval
+
+    @staticmethod
+    def remove_all_positions(groupInfo, userInfo):
+        retval = []
+        membersInfo = GSGroupMembersInfo(groupInfo.groupObj)
+        status = GSGroupMembershipStatus(userInfo, membersInfo)
+        if status.isPtnCoach:
+            retval.append(removePtnCoach(groupInfo)[0])
+        if status.isGroupAdmin:
+            retval.append(removeAdmin(groupInfo, userInfo))
+        if status.postingIsSpecial and status.isPostingMember:
+            retval.append(removePostingMember(groupInfo, userInfo))
+        if status.isModerator:
+            retval.append(removeModerator(groupInfo, userInfo))
+        if status.isModerated:
+            retval.append(unmoderate(groupInfo, userInfo))
         return retval
