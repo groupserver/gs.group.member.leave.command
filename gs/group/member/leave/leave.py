@@ -20,8 +20,9 @@ from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
 from gs.content.form.base import radio_widget, SiteForm
 from Products.GSGroup.groupInfo import GSGroupInfo
 from Products.GSGroup.joining import GSGroupJoining
-from .leaver import GroupLeaver
 from .fields import LeaveFields
+from .leaver import GroupLeaver
+from .notifier import LeaveNotifier
 
 
 class LeaveForm(SiteForm):
@@ -83,10 +84,17 @@ class LeaveForm(SiteForm):
         success = 'You have left %s. %s.' % (self.groupInfo.name,
                                              rejoinAdvice)
         failure = 'Oops! Something went wrong. Please try again.'
+
+        notifier = LeaveNotifier(self.groupInfo.groupObj, self.request)
+        notifier.update(self.groupInfo, self.loggedInUser)
+
         self.groupLeaver.removeMember()
-        retval = self.groupLeaver.isMember and failure or success
+        retval = success if not self.groupLeaver.isMember else failure
         if retval == failure:
             self.errors = True
+        else:
+            notifier.notify(self.loggedInUser)
+            # TODO: Admins
         return retval
 
     def setDelivery(self, change):

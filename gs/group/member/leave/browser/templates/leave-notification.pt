@@ -1,0 +1,63 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="context/@@groupserver_email_layout/page">
+  <head>
+    <title metal:fill-slot="title">
+      You have left
+      <tal:bock content="view/groupInfo/name">This Group</tal:bock>:
+      <tal:block content="view/siteInfo/name">Site</tal:block>
+    </title>
+  </head>
+  <body>
+    <div metal:fill-slot="body"
+         tal:define="userInfo options/userInfo | view/loggedInUserInfo;">
+      <h2>
+        You have left
+        <span tal:content="view/groupInfo/name">this group</span>
+      </h2>
+      <p>
+        Dear
+        <span tal:content="userInfo/name">Old Member</span>,
+      </p>
+      <!-- Explain what has happened.-->
+      <!--   - left group -->
+      <!--   - No more messages -->
+      <p>
+        You have left
+        <span tal:content="view/groupInfo/name">this group</span>,
+        and will no longer receive any email from the group.
+        <!-- How to get back in. -->
+        <span tal:condition="view/visibility/isPublic">
+          You can
+          <a tal:attributes="href string:${view/groupInfo/url}/join.html"
+             href="#">join the group</a>
+          at any time the future to become a member again.
+        </span>
+        <span tal:condition="view/visibility/isPrivate">
+          You can
+          <a tal:attributes="href string:${view/groupInfo/url}/request.html"
+             href="#">request membership the group</a>
+          at any time the future to become a member again.
+        </span>
+        <span tal:condition="view/visibility/isSecret">
+          You must be invited to join the group to become a member
+          again.
+        </span>
+      </p>
+      <!--Troubleshooting/return/warranty/damage information-->
+      <p>
+        If you have any problems, email us at
+        <a tal:attributes="href python:view.get_support_email(userInfo);"
+           href="#"><code tal:content="view/siteInfo/get_support_email"/></a>.
+      </p>
+      <!--Website address-->
+      <p>
+        Farewell,<br/>
+        <span>The
+        <span tal:content="view/siteInfo/name">Site</span>
+        Team</span>
+      </p>
+    </div>
+  </body>
+</html>
