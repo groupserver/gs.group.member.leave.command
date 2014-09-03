@@ -22,27 +22,26 @@
   <browser:page
     name="gs-group-member-leave-notification.html"
     for="gs.group.base.interfaces.IGSGroupMarker"
-    class=".leavenotification.LeveHTMLNotification"
+    class=".notification.LeveHTMLNotification"
     template="browser/templates/leave-notification.pt"
     permission="zope2.View"/>
   <browser:page
     name="gs-group-member-leave-notification.txt"
     for="gs.group.base.interfaces.IGSGroupMarker"
-    class=".leavenotification.LeveTXTNotification"
+    class=".notification.LeveTXTNotification"
     template="browser/templates/leave-notification-txt.pt"
     permission="zope2.View"/>
-
   <!-- The Left notification (to the admin) -->
   <browser:page
     name="gs-group-member-leave-left.html"
     for="gs.group.base.interfaces.IGSGroupMarker"
-    class=".leftnotification.LeftHTMLNotification"
+    class=".notification.LeftHTMLNotification"
     template="browser/templates/left-notification.pt"
     permission="zope2.View"/>
   <browser:page
     name="gs-group-member-leave-left.txt"
     for="gs.group.base.interfaces.IGSGroupMarker"
-    class=".leftnotification.LeftTXTNotification"
+    class=".notification.LeftTXTNotification"
     template="browser/templates/left-notification-txt.pt"
     permission="zope2.View"/>
 

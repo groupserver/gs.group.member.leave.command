@@ -51,9 +51,9 @@ class LeaveForm(SiteForm):
 
     @Lazy
     def label(self):
-        retval = u'Left Group'
+        retval = 'Left Group'
         if self.groupLeaver:
-            retval = u'Change Subscription to %s' % (self.groupInfo.name)
+            retval = 'Change Subscription to %s' % (self.groupInfo.name)
         return retval
 
     def setUpWidgets(self, ignore_request=False):
