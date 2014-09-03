@@ -5,15 +5,21 @@
   i18n_domain="groupserver">
 
   <!-- Note, this is the *Groups* folder, not the Group. -->
-  <browser:page 
+  <browser:page
     for="gs.groups.interfaces.IGSGroupsFolder"
     name="leave.html"
     class=".leave.LeaveForm"
     permission="zope2.Public"/>
 
-  <utility 
+  <utility
     factory=".audit.LeaveAuditEventFactory"
     name="gs.group.member.leave"
     permission="zope.Public" />
+
+  <adapter
+    name="unsubscribe"
+    for="gs.group.base.interfaces.IGSGroupMarker"
+    provides="gs.group.list.command.interfaces.IEmailCommand"
+    factory=".listcommand.LeaveCommand" />
 
 </configure>
