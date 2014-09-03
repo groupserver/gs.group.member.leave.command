@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-##############################################################################
+############################################################################
 #
-# Copyright © 2013 OnlineGroups.net and Contributors.
+# Copyright © 2013, 2014 OnlineGroups.net and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -11,8 +11,8 @@
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE.
 #
-##############################################################################
-from __future__ import absolute_import
+############################################################################
+from __future__ import absolute_import, unicode_literals
 from zope.cachedescriptors.property import Lazy
 from zope.formlib import form
 from zope.formlib.form import Fields
@@ -56,11 +56,13 @@ class LeaveForm(SiteForm):
 
     def setUpWidgets(self, ignore_request=False):
         self.widgets = form.setUpWidgets(self.form_fields, self.prefix,
-            self.context, self.request, form=self,
-            ignore_request=ignore_request)
-        self.widgets['changeSubscription']._displayItemForMissingValue = False
+                                         self.context, self.request,
+                                         form=self,
+                                         ignore_request=ignore_request)
+        self.widgets['changeSubscription']._displayItemForMissingValue =\
+            False
 
-    @form.action(label=u'Change', failure='handle_change_action_failure')
+    @form.action(label='Change', failure='handle_change_action_failure')
     def handle_change(self, action, data):
         change = data['changeSubscription']
         if change == 'leave':
@@ -71,15 +73,16 @@ class LeaveForm(SiteForm):
 
     def handle_change_action_failure(self, action, data, errors):
         if len(errors) == 1:
-            self.status = u'<p>There is an error:</p>'
+            self.status = '<p>There is an error:</p>'
         else:
-            self.status = u'<p>There are errors:</p>'
+            self.status = '<p>There are errors:</p>'
 
     def leaveGroup(self):
         rejoinAdvice = GSGroupJoining(self.groupInfo.groupObj).rejoin_advice
         rejoinAdvice = rejoinAdvice[0].upper() + rejoinAdvice[1:]
-        success = u'You have left %s. %s.' % (self.groupInfo.name, rejoinAdvice)
-        failure = u'Oops! Something went wrong. Please try again.'
+        success = 'You have left %s. %s.' % (self.groupInfo.name,
+                                             rejoinAdvice)
+        failure = 'Oops! Something went wrong. Please try again.'
         self.groupLeaver.removeMember()
         retval = self.groupLeaver.isMember and failure or success
         if retval == failure:
@@ -90,15 +93,15 @@ class LeaveForm(SiteForm):
         web = 'web'
         digest = 'digest'
         assert change in [web, digest], \
-          'Subscription change must be to web or digest'
+            'Subscription change must be to web or digest'
         user = self.loggedInUser.user
         if change == digest:
             user.set_enableDigestByKey(self.groupInfo.id)
-            status = u'The posts from %s will now be delivered '\
-              'to you in the form of a daily digest of topics.' % \
-               self.groupInfo.name
+            status = 'The posts from %s will now be delivered '\
+                     'to you in the form of a daily digest of topics.' % \
+                     self.groupInfo.name
         elif change == web:
             user.set_disableDeliveryByKey(self.groupInfo.id)
-            s = u'You will no longer receive any posts from {0} via email.'
+            s = 'You will no longer receive any posts from {0} via email.'
             status = s.format(self.groupInfo.name)
         return status
