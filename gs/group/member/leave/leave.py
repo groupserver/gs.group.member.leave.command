@@ -17,12 +17,13 @@ from zope.cachedescriptors.property import Lazy
 from zope.formlib import form
 from zope.formlib.form import Fields
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
+from gs.core import to_ascii
 from gs.content.form.base import radio_widget, SiteForm
 from Products.GSGroup.groupInfo import GSGroupInfo
 from Products.GSGroup.joining import GSGroupJoining
 from .fields import LeaveFields
 from .leaver import GroupLeaver
-from .notifier import LeaveNotifier
+from .notifier import LeaveNotifier, LeftNotifier
 
 
 class LeaveForm(SiteForm):
@@ -87,14 +88,22 @@ class LeaveForm(SiteForm):
 
         notifier = LeaveNotifier(self.groupInfo.groupObj, self.request)
         notifier.update(self.groupInfo, self.loggedInUser)
-
+        adminNotifiers = []
+        for admin in self.groupInfo.group_admins:
+            if admin.id != self.loggedInUser.id:
+                an = LeftNotifier(self.groupInfo.groupObj, self.request)
+                an.update(self.groupInfo, self.loggedInUser, admin)
+                adminNotifiers.append(an)
         self.groupLeaver.removeMember()
         retval = success if not self.groupLeaver.isMember else failure
         if retval == failure:
             self.errors = True
         else:
             notifier.notify(self.loggedInUser)
-            # TODO: Admins
+            for adminNotifier in adminNotifiers:
+                adminNotifier.notify()
+        self.request.response.setHeader(to_ascii('Content-Type'),
+                                        to_ascii('text/html'))
         return retval
 
     def setDelivery(self, change):

@@ -58,3 +58,29 @@ pre-rendered before it is sent off.'''
 
         self.request.response.setHeader(to_ascii('Content-Type'),
                                         to_ascii(self.oldContentType))
+
+
+class LeftNotifier(LeaveNotifier):
+    htmlTemplateName = 'gs-group-member-leave-left.html'
+    textTemplateName = 'gs-group-member-leave-left.txt'
+
+    def update(self, groupInfo, userInfo, adminInfo):
+        '''Because the user may not have permission to see the group after
+he or she has left this ``update`` method allows the notification to be
+pre-rendered before it is sent off.'''
+        self.adminInfo = adminInfo
+        self.subject = '{0} has left {1}'.format(userInfo.name,
+                                                 groupInfo.name)
+        htmlTemplate = getMultiAdapter((self.context, self.request),
+                                       name=self.htmlTemplateName)
+        self.html = htmlTemplate(userInfo=userInfo, adminInfo=adminInfo)
+        textTemplate = getMultiAdapter((self.context, self.request),
+                                       name=self.textTemplateName)
+        self.text = textTemplate(userInfo=userInfo, adminInfo=adminInfo)
+
+    def notify(self):
+        sender = MessageSender(self.context, self.adminInfo)
+        sender.send_message(self.subject, self.text, self.html)
+
+        self.request.response.setHeader(to_ascii('Content-Type'),
+                                        to_ascii(self.oldContentType))

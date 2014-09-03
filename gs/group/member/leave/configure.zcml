@@ -33,6 +33,18 @@
     permission="zope2.View"/>
 
   <!-- The Left notification (to the admin) -->
+  <browser:page
+    name="gs-group-member-leave-left.html"
+    for="gs.group.base.interfaces.IGSGroupMarker"
+    class=".leftnotification.LeftHTMLNotification"
+    template="browser/templates/left-notification.pt"
+    permission="zope2.View"/>
+  <browser:page
+    name="gs-group-member-leave-left.txt"
+    for="gs.group.base.interfaces.IGSGroupMarker"
+    class=".leftnotification.LeftTXTNotification"
+    template="browser/templates/left-notification-txt.pt"
+    permission="zope2.View"/>
 
   <!-- The audit-event factory -->
   <utility
