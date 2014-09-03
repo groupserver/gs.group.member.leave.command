@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-##############################################################################
+############################################################################
 #
 # Copyright © 2013 OnlineGroups.net and Contributors.
 # All Rights Reserved.
@@ -11,7 +11,7 @@
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE.
 #
-##############################################################################
+############################################################################
 from __future__ import absolute_import
 from zope.event import notify
 from gs.profile.notify.interfaces import IGSNotifyUser
@@ -63,9 +63,9 @@ class GroupLeaver(object):
         admins = [IGSNotifyUser(a) for a in self.groupInfo.group_admins
                   if a.id != self.userInfo.id]
         nDict = {
-          'siteInfo': siteInfo,
-          'groupInfo': self.groupInfo,
-          'userInfo': self.userInfo
+            'siteInfo': siteInfo,
+            'groupInfo': self.groupInfo,
+            'userInfo': self.userInfo
         }
         retval = (admins, nDict)
         return retval
