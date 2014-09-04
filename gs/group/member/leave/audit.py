@@ -20,7 +20,7 @@ from datetime import datetime
 from zope.cachedescriptors.property import Lazy
 from zope.component import createObject
 from zope.component.interfaces import IFactory
-from zope.interface import implements, implementedBy
+from zope.interface import implementer, implementedBy
 from Products.XWFCore.XWFUtils import munge_date
 from Products.CustomUserFolder.userinfo import userInfo_to_anchor
 from Products.GSGroup.groupInfo import groupInfo_to_anchor
@@ -31,12 +31,13 @@ from logging import getLogger
 log = getLogger(SUBSYSTEM)
 UNKNOWN = '0'  # Unknown is always "0"
 LEAVE = '1'
+LEAVE_COMMAND = '2'
 
 
+@implementer(IFactory)
 class LeaveAuditEventFactory(object):
     """A Factory for group leaving events.
     """
-    implements(IFactory)
 
     title = 'GroupServer Leave Group Audit Event Factory'
     description = 'Creates a GroupServer event auditor for leaving groups'
@@ -50,10 +51,13 @@ class LeaveAuditEventFactory(object):
         if (code == LEAVE):
             event = LeaveEvent(context, event_id, date, userInfo,
                                instanceUserInfo, siteInfo, groupInfo)
+        elif (code == LEAVE_COMMAND):
+            event = LeaveCommand(context, event_id, date, instanceUserInfo,
+                                 groupInfo, siteInfo, instanceDatum)
         else:
             event = BasicAuditEvent(context, event_id, UNKNOWN, date,
-                                    userInfo, instanceUserInfo, siteInfo,
-                                    groupInfo, instanceDatum,
+                                    instanceUserInfo, instanceUserInfo,
+                                    siteInfo, groupInfo, instanceDatum,
                                     supplementaryDatum, SUBSYSTEM)
         assert event
         return event
@@ -62,11 +66,10 @@ class LeaveAuditEventFactory(object):
         return implementedBy(BasicAuditEvent)
 
 
+@implementer(IAuditEvent)
 class LeaveEvent(BasicAuditEvent):
     ''' An audit-trail event representing a user being removed
-        from a group
-    '''
-    implements(IAuditEvent)
+        from a group'''
 
     def __init__(self, context, id, d, userInfo, instanceUserInfo,
                  siteInfo, groupInfo):
@@ -117,11 +120,39 @@ class LeaveEvent(BasicAuditEvent):
         return retval
 
 
+@implementer(IAuditEvent)
+class LeaveCommand(BasicAuditEvent):
+    'The audit-event for an email-command comming in.'
+
+    def __init__(self, context, eventId, d, instanceUserInfo, groupInfo,
+                 siteInfo, email):
+        super(LeaveCommand, self).__init__(
+            context, eventId, LEAVE_COMMAND, d, instanceUserInfo,
+            instanceUserInfo, siteInfo, groupInfo, email, None, SUBSYSTEM)
+
+    def __unicode__(self):
+        r = 'Email-command to leave {0} ({1}) on {2} ({3}) recieved for '\
+            '{4} ({5}) <{6}>.'
+        retval = r.format(
+            self.groupInfo.name, self.groupInfo.id,
+            self.siteInfo.name, self.siteInfo.id,
+            self.instanceUserInfo.name, self.instanceUserInfo.id,
+            self.instanceDatum)
+        return retval
+
+    @property
+    def xhtml(self):
+        cssClass = 'audit-event groupserver-group-member-%s' % self.code
+        r = '<span class="{0}">Sent an email in to leave {1}</span> ({2})'
+        retval = r.format(cssClass, groupInfo_to_anchor(self.groupInfo),
+                          munge_date(self.context, self.date))
+        return retval
+
+
 class LeaveAuditor(object):
     """An Auditor for leaving"""
     def __init__(self, context, instanceUserInfo, groupInfo=None):
-        """Create a leaving auditor.
-        """
+        """Create a leaving auditor."""
         self.context = context
         self.instanceUserInfo = instanceUserInfo
         self.__groupInfo = groupInfo

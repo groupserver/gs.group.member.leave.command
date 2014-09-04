@@ -17,6 +17,7 @@ from email.utils import parseaddr
 from zope.component import createObject
 from gs.group.list.command import CommandResult, CommandABC
 from Products.CustomUserFolder.interfaces import IGSUserInfo
+from .audit import LeaveAuditor, LEAVE_COMMAND
 from .utils import leave_group
 
 
@@ -36,14 +37,23 @@ class LeaveCommand(CommandABC):
             if userInfo:
                 groupInfo = createObject('groupserver.GroupInfo',
                                          self.group)
+                auditor = LeaveAuditor(self.group, userInfo, groupInfo)
+                addr = self.get_email_addr(email)
+                auditor.info(LEAVE_COMMAND, addr)
+
                 leave_group(groupInfo, userInfo, request)
             retval = CommandResult.commandStop
         return retval
 
+    @staticmethod
+    def get_email_addr(emailMessage):
+        retval = parseaddr(emailMessage['From'])[1]
+        return retval
+
     def get_user(self, email):
         retval = None
-        addr = parseaddr(email['From'])[1]
         sr = self.group.site_root()
+        addr = self.get_email_addr(email)
         user = sr.acl_users.get_userByEmail(addr)
         if user:
             retval = IGSUserInfo(user)
