@@ -45,6 +45,22 @@
     template="browser/templates/left-notification-txt.pt"
     permission="zope2.View"/>
 
+  <!--The not-a-member notification-->
+  <!-- Note, like the Leave page itself, this page is for -->
+  <!-- the *Groups* folder, not the Group. -->
+   <browser:page
+    name="gs-group-member-leave-not-a-member.html"
+    for="gs.groups.interfaces.IGSGroupsFolder"
+    class=".notification.NotAMemberHTMLNotification"
+    template="browser/templates/not-member-notification.pt"
+    permission="zope2.Public"/>
+   <browser:page
+    name="gs-group-member-leave-not-a-member.txt"
+    for="gs.groups.interfaces.IGSGroupsFolder"
+    class=".notification.NotAMemberTXTNotification"
+    template="browser/templates/not-member-notification-txt.pt"
+    permission="zope2.Public"/>
+
   <!-- The audit-event factory -->
   <utility
     factory=".audit.LeaveAuditEventFactory"

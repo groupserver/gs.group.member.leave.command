@@ -15,7 +15,7 @@
 from __future__ import absolute_import, unicode_literals
 from urllib import quote
 from zope.cachedescriptors.property import Lazy
-from gs.content.email.base import GroupEmail, TextMixin
+from gs.content.email.base import (GroupEmail, SiteEmail, TextMixin)
 from gs.group.privacy.interfaces import IGSGroupVisibility
 UTF8 = 'utf-8'
 
@@ -83,4 +83,34 @@ class LeftTXTNotification(LeftHTMLNotification, TextMixin):
         super(LeftTXTNotification, self).__init__(group, request)
         filename = 'left-{0}-{1}.txt'.format(self.siteInfo.id,
                                              self.groupInfo.id)
+        self.set_header(filename)
+
+
+# Not a member
+
+
+class NotAMemberHTMLNotification(SiteEmail):
+    '''The notification to the sender that he or she is not a member of
+    the group.'''
+
+    def __init__(self, context, request):
+        super(NotAMemberHTMLNotification, self).__init__(context, request)
+
+    def get_support_email(self, emailAddress, groupURL):
+        subj = 'Not a member'
+        msg = 'Hello,\n\nI tried to leave a group and I got a message '\
+              'back saying that I\nwas not a member, and...\n\n--\nThese '\
+              'links may help you:\n  Group  {url}\n  Me     {email}\n'
+        body = msg.format(url=groupURL, email=emailAddress)
+        m = 'mailto:{to}?Subject={subj}&body={body}'
+        retval = m.format(to=self.siteInfo.get_support_email(),
+                          subj=quote(subj), body=quote(body.encode(UTF8)))
+        return retval
+
+
+class NotAMemberTXTNotification(NotAMemberHTMLNotification, TextMixin):
+
+    def __init__(self, context, request):
+        super(NotAMemberTXTNotification, self).__init__(context, request)
+        filename = 'not-a-member-{0}.txt'.format(self.siteInfo.id)
         self.set_header(filename)

@@ -18,6 +18,7 @@ from zope.component import createObject
 from gs.group.list.command import CommandResult, CommandABC
 from Products.CustomUserFolder.interfaces import IGSUserInfo
 from .audit import LeaveAuditor, LEAVE_COMMAND
+from .notifiernonmember import NotMemberNotifier
 from .utils import leave_group
 
 
@@ -33,15 +34,19 @@ class LeaveCommand(CommandABC):
 
         retval = CommandResult.notACommand
         if (len(components) == 1):
+            groupInfo = createObject('groupserver.GroupInfo',
+                                     self.group)
             userInfo = self.get_user(email)
             if userInfo:
-                groupInfo = createObject('groupserver.GroupInfo',
-                                         self.group)
                 auditor = LeaveAuditor(self.group, userInfo, groupInfo)
                 addr = self.get_email_addr(email)
                 auditor.info(LEAVE_COMMAND, addr)
 
                 leave_group(groupInfo, userInfo, request)
+            else:
+                context = self.group.aq_parent
+                notifier = NotMemberNotifier(context, request)
+                notifier.notify(groupInfo, self.get_email_addr(email))
             retval = CommandResult.commandStop
         return retval
 

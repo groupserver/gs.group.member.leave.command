@@ -1,0 +1,24 @@
+<tal:block
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  define="emailAddress options/emailAddress | string:person@example.com;
+          groupName options/groupName | string:Example Group;
+          groupURL options/groupURL | string:http://lists.example.com/groups/eg/">Hello,
+
+<tal:block
+  define="m string:We received an email from you, asking that you be removed from ${groupName}. However, according to our records you are not member of the group (so you should not be receiving any messages from the group). Email us at ${view/siteInfo/get_support_email} and we will try and fix your group membership."
+  content="python:view.fill(m)" />
+
+Kind regards,
+  The <tal:block content="view/siteInfo/name">Site</tal:block> Team
+
+------------------------------------------------------------------------
+
+Privacy
+  <tal:block content="string:${view/siteInfo/url}/policies/privacy"/>
+
+Acceptable Use
+  <tal:block content="string:${view/siteInfo/url}/policies/aup"/>
+
+Terms of Service
+  <tal:block content="string:${view/siteInfo/url}/policies/tos"/>
+</tal:block>

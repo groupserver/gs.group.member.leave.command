@@ -1,0 +1,47 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="context/@@groupserver_email_layout/page">
+  <head>
+    <title metal:fill-slot="title">
+      Not a member:
+      <tal:block content="view/siteInfo/name">Site</tal:block>
+    </title>
+  </head>
+  <body>
+    <div metal:fill-slot="body"
+         tal:define="emailAddress options/emailAddress | string:person@example.com;
+                     groupName options/groupName | string:Example Group;
+                     groupURL options/groupURL | string:http://lists.example.com/groups/eg/">
+      <h2>
+        Not a member of
+        <span tal:content="groupName">this group</span>
+      </h2>
+      <p>
+        Hello,
+      </p>
+      <!-- Explain what has happened.-->
+      <!--   - not in group -->
+      <p>
+        We received an email from you, asking that you be removed
+        from
+        <span tal:content="groupName">this group</span>.
+        However, according to our records you are not member of
+        the group (so you should not be receiving any messages
+        from the group).
+        <!--Troubleshooting/return/warranty/damage information-->
+        Email us at
+        <a tal:attributes="href python:view.get_support_email(emailAddress, groupURL);"
+           href="#"><code tal:content="view/siteInfo/get_support_email"/></a>
+        and we will try and fix your group membership.
+      </p>
+      <!--Website address-->
+      <p>
+        Kind regards,<br/>
+        <span>The
+        <span tal:content="view/siteInfo/name">Site</span>
+        Team</span>
+      </p>
+    </div>
+  </body>
+</html>
