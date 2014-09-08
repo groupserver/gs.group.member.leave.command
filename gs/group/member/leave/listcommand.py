@@ -14,6 +14,8 @@
 ############################################################################
 from __future__ import absolute_import, unicode_literals
 from email.utils import parseaddr
+from logging import getLogger
+log = getLogger('gs.group.member.leave.leavecommand')
 from zope.component import createObject
 from gs.group.list.command import CommandResult, CommandABC
 from Products.CustomUserFolder.interfaces import IGSUserInfo
@@ -44,9 +46,17 @@ class LeaveCommand(CommandABC):
 
                 leave_group(groupInfo, userInfo, request)
             else:
+                addr = self.get_email_addr(email)
+                m = 'Sending a "Cannot leave: not a member" '\
+                    'notification to {toEmail} because a Unsubscribe '\
+                    'command came in to  {group.name} ({group.id}) '\
+                    'on {site.name} ({site.id}).'
+                msg = m.format(toEmail=addr, group=groupInfo, 
+                               site=groupInfo.siteInfo)
+                log.info(msg)
                 context = self.group.aq_parent
                 notifier = NotMemberNotifier(context, request)
-                notifier.notify(groupInfo, self.get_email_addr(email))
+                notifier.notify(groupInfo, addr)
             retval = CommandResult.commandStop
         return retval
 
