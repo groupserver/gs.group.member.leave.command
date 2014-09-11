@@ -13,15 +13,13 @@
 #
 ############################################################################
 from __future__ import absolute_import, unicode_literals
-from email import message_from_string
 from email.Header import Header
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
-from email.MIMEMessage import MIMEMessage
-from email.utils import (formataddr, parseaddr)
+from email.utils import formataddr
 from zope.cachedescriptors.property import Lazy
-from zope.component import (createObject, getMultiAdapter)
-from gs.core import (to_ascii, to_unicode_or_bust)
+from zope.component import getMultiAdapter
+from gs.core import to_unicode_or_bust
 from gs.email import send_email
 UTF8 = 'utf-8'
 
@@ -66,7 +64,7 @@ class NotMemberNotifier(object):
                                  groupName=groupInfo.name,
                                  groupURL=groupInfo.url)
 
-        message = self.create_message(toEmailAddress, fromAddr, 
+        message = self.create_message(toEmailAddress, fromAddr,
                                       subject, text, html)
         send_email(groupInfo.siteInfo.get_support_email(),
                    toEmailAddress, message)
