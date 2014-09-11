@@ -15,7 +15,9 @@
 from __future__ import unicode_literals
 from zope.cachedescriptors.property import Lazy
 from zope.component import createObject, getMultiAdapter
+from zope.i18n import translate
 from gs.profile.notify import MessageSender, NotifierABC
+from . import GSMessageFactory as _
 UTF8 = 'utf-8'
 
 
@@ -40,7 +42,10 @@ class LeaveNotifier(NotifierABC):
         '''Because the user may not have permission to see the group after
 he or she has left this ``update`` method allows the notification to be
 pre-rendered before it is sent off.'''
-        self.subject = 'You have left {}'.format(groupInfo.name)
+        subject = _('leave-notification-subject',
+                    'You have left ${groupName}',
+                    mapping={'groupName': groupInfo.name})
+        self.subject = translate(subject)
         htmlTemplate = getMultiAdapter((self.context, self.request),
                                        name=self.htmlTemplateName)
         self.html = htmlTemplate(userInfo=userInfo)
@@ -63,8 +68,11 @@ class LeftNotifier(LeaveNotifier):
 he or she has left this ``update`` method allows the notification to be
 pre-rendered before it is sent off.'''
         self.adminInfo = adminInfo
-        self.subject = '{0} has left {1}'.format(userInfo.name,
-                                                 groupInfo.name)
+        subject = _('member-left-subject',
+                    '${userName} has left ${groupName}',
+                    mapping={'userName': userInfo.name,
+                             'groupName': groupInfo.name})
+        self.subject = translate(subject)
         htmlTemplate = getMultiAdapter((self.context, self.request),
                                        name=self.htmlTemplateName)
         self.html = htmlTemplate(userInfo=userInfo, adminInfo=adminInfo)

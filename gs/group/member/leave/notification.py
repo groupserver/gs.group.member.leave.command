@@ -13,10 +13,11 @@
 #
 ############################################################################
 from __future__ import absolute_import, unicode_literals
-from urllib import quote
 from zope.cachedescriptors.property import Lazy
+from zope.i18n import translate
 from gs.content.email.base import (GroupEmail, SiteEmail, TextMixin)
 from gs.group.privacy.interfaces import IGSGroupVisibility
+from . import GSMessageFactory as _
 UTF8 = 'utf-8'
 
 
@@ -28,16 +29,20 @@ class LeveHTMLNotification(GroupEmail):
         self.group = group
 
     def get_support_email(self, user):
-        subj = 'Left a group'
+        subject = _('support-notification-leave-subject', 'Left a group')
+        translatedSubject = translate(subject)
         uu = '{}{}'.format(self.siteInfo.url, user.url)
-        msg = 'Hello,\n\nI left the group {group} '\
-              'and...\n\n--\nThese links may help you:\n  '\
-              'Group          {url}\n  Me             {userUrl}\n'
-        body = msg.format(group=self.groupInfo.name, url=self.groupInfo.url,
-                          userUrl=uu)
-        m = 'mailto:{to}?Subject={subj}&body={body}'
-        retval = m.format(to=self.siteInfo.get_support_email(),
-                          subj=quote(subj), body=quote(body.encode(UTF8)))
+        body = _('support-notification-leave-body',
+                 'Hello,\n\nI left the group ${groupName} and...\n\n--\n'
+                 'These links may help you:\n'
+                 '  Group  ${groupUrl}\n'
+                 '  Me     ${userUrl}\n',
+                 mapping={'groupName': self.groupInfo.name,
+                          'groupUrl': self.groupInfo.url,
+                          'userUrl': uu})
+        translatedBody = translate(body)
+        retval = self.mailto(self.siteInfo.get_support_email(),
+                             translatedSubject, translatedBody)
         return retval
 
     @Lazy
@@ -63,17 +68,23 @@ class LeftHTMLNotification(GroupEmail):
         self.group = group
 
     def get_support_email(self, user, admin):
-        subj = 'A member left my group'
+        subject = _('support-notification-member-left-subject',
+                    'A member left my group')
+        translatedSubject = translate(subject)
         uu = '{}{}'.format(self.siteInfo.url, user.url)
         au = '{}{}'.format(self.siteInfo.url, admin.url)
-        msg = 'Hello,\n\nA member left my group, {group}, '\
-              'and...\n\n--\nThese links may be useful:\n  '\
-              'Group   {url}\n  Me      {adminUrl}\n  Member  {userUrl}\n'
-        body = msg.format(group=self.groupInfo.name, url=self.groupInfo.url,
-                          adminUrl=au, userUrl=uu)
-        m = 'mailto:{to}?Subject={subj}&body={body}'
-        retval = m.format(to=self.siteInfo.get_support_email(),
-                          subj=quote(subj), body=quote(body.encode(UTF8)))
+        body = _('support-notification-member-left-body',
+                 'Hello,\n\nA member left my group, ${groupName}, and...'
+                 '\n\n--\nThese links may be useful:\n'
+                 '  Group   ${groupUrl}\n'
+                 '  Me      ${adminUrl}\n'
+                 '  Member  ${userUrl}\n',
+                 mapping={'groupName': self.groupInfo.name,
+                          'groupUrl': self.groupInfo.url,
+                          'adminUrl': au, 'userUrl': uu})
+        translatedBody = translate(body)
+        retval = self.mailto(self.siteInfo.get_support_email(),
+                             translatedSubject, translatedBody)
         return retval
 
 
@@ -96,15 +107,20 @@ class NotAMemberHTMLNotification(SiteEmail):
     def __init__(self, context, request):
         super(NotAMemberHTMLNotification, self).__init__(context, request)
 
-    def get_support_email(self, emailAddress, groupURL):
-        subj = 'Not a member'
-        msg = 'Hello,\n\nI tried to leave a group and I got a message '\
-              'back saying that I\nwas not a member, and...\n\n--\nThese '\
-              'links may help you:\n  Group  {url}\n  Me     {email}\n'
-        body = msg.format(url=groupURL, email=emailAddress)
-        m = 'mailto:{to}?Subject={subj}&body={body}'
-        retval = m.format(to=self.siteInfo.get_support_email(),
-                          subj=quote(subj), body=quote(body.encode(UTF8)))
+    def get_support_email(self, emailAddress, groupUrl):
+        subject = _('support-notification-not-member-subject',
+                    'Not a member')
+        translatedSubject = translate(subject)
+        body = _('support-notifiation-not-member-body',
+                 'Hello,\n\nI tried to leave a group and I got a message '
+                 'back saying that I\nwas not a member, and...\n\n--\n'
+                 'These links may help you:\n'
+                 '  Group  {groupUrl}\n'
+                 '  Me     {email}\n',
+                 mapping={'groupUrl': groupUrl, 'email': emailAddress})
+        translatedBody = translate(body)
+        retval = self.mailto(self.siteInfo.get_support_email(),
+                             translatedSubject, translatedBody)
         return retval
 
 
