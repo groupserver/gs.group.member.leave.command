@@ -95,8 +95,7 @@ class LeaveForm(SiteForm):
         failure = _('leave-fail',
                     'Something went wrong. Please try again.')
 
-        left = leave_group(self.groupInfo.groupObj, self.loggedInUser,
-                           self.request)
+        left = leave_group(self.groupInfo, self.loggedInUser, self.request)
         retval = success if left else failure
         self.errors = not left
         self.request.response.setHeader(to_ascii('Content-Type'),
