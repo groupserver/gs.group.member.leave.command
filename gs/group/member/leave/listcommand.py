@@ -51,7 +51,7 @@ class LeaveCommand(CommandABC):
                     'notification to {toEmail} because a Unsubscribe '\
                     'command came in to  {group.name} ({group.id}) '\
                     'on {site.name} ({site.id}).'
-                msg = m.format(toEmail=addr, group=groupInfo, 
+                msg = m.format(toEmail=addr, group=groupInfo,
                                site=groupInfo.siteInfo)
                 log.info(msg)
                 context = self.group.aq_parent
