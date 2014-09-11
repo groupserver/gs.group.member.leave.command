@@ -15,20 +15,16 @@
 from __future__ import unicode_literals
 from zope.cachedescriptors.property import Lazy
 from zope.component import createObject, getMultiAdapter
-from gs.core import to_ascii
-from gs.profile.notify import MessageSender
+from gs.profile.notify import MessageSender, NotifierABC
 UTF8 = 'utf-8'
 
 
-class LeaveNotifier(object):
+class LeaveNotifier(NotifierABC):
     htmlTemplateName = 'gs-group-member-leave-notification.html'
     textTemplateName = 'gs-group-member-leave-notification.txt'
 
     def __init__(self, context, request):
-        self.context = context
-        self.request = request
-        h = self.request.response.getHeader('Content-Type')
-        self.oldContentType = to_ascii(h if h else 'text/html')
+        super(LeaveNotifier, self).__init__(context, request)
         self.__updated = False
         self.htmlTemplate = None
         self.textTemplate = None
@@ -55,9 +51,7 @@ pre-rendered before it is sent off.'''
     def notify(self, userInfo):
         sender = MessageSender(self.context, userInfo)
         sender.send_message(self.subject, self.text, self.html)
-
-        self.request.response.setHeader(to_ascii('Content-Type'),
-                                        to_ascii(self.oldContentType))
+        self.reset_content_type()
 
 
 class LeftNotifier(LeaveNotifier):
@@ -81,6 +75,4 @@ pre-rendered before it is sent off.'''
     def notify(self):
         sender = MessageSender(self.context, self.adminInfo)
         sender.send_message(self.subject, self.text, self.html)
-
-        self.request.response.setHeader(to_ascii('Content-Type'),
-                                        to_ascii(self.oldContentType))
+        self.reset_content_type()
