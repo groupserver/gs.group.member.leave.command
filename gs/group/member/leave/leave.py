@@ -23,13 +23,20 @@ from gs.core import to_ascii
 from gs.content.form.base import radio_widget, SiteForm
 from Products.GSGroup.groupInfo import GSGroupInfo
 from Products.GSGroup.joining import GSGroupJoining
+from . import GSMessageFactory as _
 from .fields import LeaveFields
+from .leaver import GroupLeaver
 from .utils import leave_group
 
 
 class LeaveForm(SiteForm):
     pageTemplateFileName = 'browser/templates/leave.pt'
     template = ZopeTwoPageTemplateFile(pageTemplateFileName)
+
+    @Lazy
+    def groupLeaver(self):
+        retval = GroupLeaver(self.groupInfo, self.loggedInUser)
+        return retval
 
     @Lazy
     def groupInfo(self):
@@ -48,9 +55,10 @@ class LeaveForm(SiteForm):
 
     @Lazy
     def label(self):
-        retval = 'Left Group'
+        retval = _('left', 'Left group')
         if self.groupLeaver:
-            retval = 'Change Subscription to %s' % (self.groupInfo.name)
+            retval = _('changed', 'Change subscription to ${groupName}',
+                       mapping={'groupName': self.groupInfo.name})
         return retval
 
     def setUpWidgets(self, ignore_request=False):
@@ -61,7 +69,8 @@ class LeaveForm(SiteForm):
         self.widgets['changeSubscription']._displayItemForMissingValue =\
             False
 
-    @form.action(label='Change', failure='handle_change_action_failure')
+    @form.action(label=_('change', 'Change'),
+                 failure='handle_change_action_failure')
     def handle_change(self, action, data):
         change = data['changeSubscription']
         if change == 'leave':
@@ -79,9 +88,12 @@ class LeaveForm(SiteForm):
     def leaveGroup(self):
         rejoinAdvice = GSGroupJoining(self.groupInfo.groupObj).rejoin_advice
         rejoinAdvice = rejoinAdvice[0].upper() + rejoinAdvice[1:]
-        success = 'You have left %s. %s.' % (self.groupInfo.name,
-                                             rejoinAdvice)
-        failure = 'Oops! Something went wrong. Please try again.'
+        success = _('leave-success',
+                    'You have left ${groupName}. ${rejoin}.',
+                    mapping={'groupName': self.groupInfo.name,
+                             'rejoin': rejoinAdvice})
+        failure = _('leave-fail',
+                    'Something went wrong. Please try again.')
 
         left = leave_group(self.groupInfo.groupObj, self.loggedInUser,
                            self.request)
@@ -99,11 +111,14 @@ class LeaveForm(SiteForm):
         user = self.loggedInUser.user
         if change == digest:
             user.set_enableDigestByKey(self.groupInfo.id)
-            status = 'The posts from %s will now be delivered '\
-                     'to you in the form of a daily digest of topics.' % \
-                     self.groupInfo.name
+            status = _('change-digest',
+                       'The posts from ${groupName} will now be delivered'
+                       'to you in the form of a daily digest of topics.',
+                       mapping={'groupName': self.groupInfo.name})
         elif change == web:
             user.set_disableDeliveryByKey(self.groupInfo.id)
-            s = 'You will no longer receive any posts from {0} via email.'
-            status = s.format(self.groupInfo.name)
+            status = _('change-web-only',
+                       'You will no longer receive any posts from '
+                       '${groupName} via email.',
+                       mapping={'groupName': self.groupInfo.name})
         return status
