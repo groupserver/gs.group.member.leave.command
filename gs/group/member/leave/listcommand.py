@@ -20,7 +20,7 @@ from zope.component import createObject
 from gs.group.list.command import CommandResult, CommandABC
 from Products.CustomUserFolder.interfaces import IGSUserInfo
 from .audit import LeaveAuditor, LEAVE_COMMAND
-from .notifiernonmember import NotMemberNotifier
+from .notifier import NotMemberNotifier
 from .utils import leave_group
 
 

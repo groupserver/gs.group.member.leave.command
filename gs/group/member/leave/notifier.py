@@ -13,15 +13,15 @@
 #
 ############################################################################
 from __future__ import unicode_literals
-from zope.cachedescriptors.property import Lazy
-from zope.component import createObject, getMultiAdapter
+from zope.component import getMultiAdapter
 from zope.i18n import translate
-from gs.profile.notify import MessageSender, NotifierABC
+from gs.email import send_email
+from gs.content.email.base import (AnonymousNotifierABC, GroupNotifierABC)
+from gs.profile.notify import MessageSender
 from . import GSMessageFactory as _
-UTF8 = 'utf-8'
 
 
-class LeaveNotifier(NotifierABC):
+class LeaveNotifier(GroupNotifierABC):
     htmlTemplateName = 'gs-group-member-leave-notification.html'
     textTemplateName = 'gs-group-member-leave-notification.txt'
 
@@ -30,13 +30,6 @@ class LeaveNotifier(NotifierABC):
         self.__updated = False
         self.htmlTemplate = None
         self.textTemplate = None
-
-    @Lazy
-    def groupInfo(self):
-        retval = createObject('groupserver.GroupInfo', self.context)
-        assert retval, 'Failed to create the GroupInfo from %s' % \
-            self.context
-        return retval
 
     def update(self, groupInfo, userInfo):
         '''Because the user may not have permission to see the group after
@@ -83,4 +76,28 @@ pre-rendered before it is sent off.'''
     def notify(self):
         sender = MessageSender(self.context, self.adminInfo)
         sender.send_message(self.subject, self.text, self.html)
+        self.reset_content_type()
+
+
+class NotMemberNotifier(AnonymousNotifierABC):
+    htmlTemplateName = 'gs-group-member-leave-not-a-member.html'
+    textTemplateName = 'gs-group-member-leave-not-a-member.txt'
+
+    def notify(self, groupInfo, toEmailAddress):
+        fromAddr = self.fromAddr(groupInfo.siteInfo)
+        subject = _('leave-request-problem-subject',
+                    'Request to leave ${groupName}',
+                    mapping={'groupName': groupInfo.name})
+        translatedSubject = translate(subject)
+        html = self.htmlTemplate(emailAddress=toEmailAddress,
+                                 groupName=groupInfo.name,
+                                 groupURL=groupInfo.url)
+        text = self.textTemplate(emailAddress=toEmailAddress,
+                                 groupName=groupInfo.name,
+                                 groupURL=groupInfo.url)
+
+        message = self.create_message(toEmailAddress, fromAddr,
+                                      translatedSubject, text, html)
+        send_email(groupInfo.siteInfo.get_support_email(),
+                   toEmailAddress, message)
         self.reset_content_type()
