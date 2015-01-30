@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ############################################################################
 #
-# Copyright © 2014 OnlineGroups.net and Contributors.
+# Copyright © 2014, 2015 OnlineGroups.net and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -108,6 +108,7 @@ class NotAMemberHTMLNotification(SiteEmail):
         super(NotAMemberHTMLNotification, self).__init__(context, request)
 
     def get_support_email(self, emailAddress, groupUrl):
+        print ('Here')
         subject = _('support-notification-not-member-subject',
                     'Not a member')
         translatedSubject = translate(subject)
@@ -115,8 +116,8 @@ class NotAMemberHTMLNotification(SiteEmail):
                  'Hello,\n\nI tried to leave a group and I got a message '
                  'back saying that I\nwas not a member, and...\n\n--\n'
                  'These links may help you:\n'
-                 '  Group  {groupUrl}\n'
-                 '  Me     {email}\n',
+                 '  Group  ${groupUrl}\n'
+                 '  Me     ${email}\n',
                  mapping={'groupUrl': groupUrl, 'email': emailAddress})
         translatedBody = translate(body)
         retval = self.mailto(self.siteInfo.get_support_email(),
