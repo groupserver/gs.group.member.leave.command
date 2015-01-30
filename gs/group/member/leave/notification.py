@@ -108,7 +108,6 @@ class NotAMemberHTMLNotification(SiteEmail):
         super(NotAMemberHTMLNotification, self).__init__(context, request)
 
     def get_support_email(self, emailAddress, groupUrl):
-        print ('Here')
         subject = _('support-notification-not-member-subject',
                     'Not a member')
         translatedSubject = translate(subject)
