@@ -7,7 +7,7 @@ Leave a GroupServer group
 
 :Author: `Michael JasonSmith`_
 :Contact: Michael JasonSmith <mpj17@onlinegroups.net>
-:Date: 2014-10-10
+:Date: 2015-01-30
 :Organization: `GroupServer.org`_
 :Copyright: This document is licensed under a
   `Creative Commons Attribution-Share Alike 4.0 International License`_
@@ -78,17 +78,30 @@ rendered.
 Notifications
 =============
 
-Two notifications are provided by this product. The *You have
-left* notification (``gs-group-member-leave-notification.html``
-in the group context) tells the former member that he or she has
-left. It is sent from the **Support** email address, which is
-quite important: if it comes from the group that has been left
-then it is (highly) likely to be marked as spam.
+Three notifications are provided by this product. 
 
-The *Member has left* notification
-(``gs-group-member-leave-left.html`` inthe group context) is sent
-to the group administrators telling them that the member has
-left.
+You have left:
+  This notification tells the former member that he or she has
+  left. It is sent from the **Support** email address, which is
+  quite important: if it comes from the group that has been left
+  then it is (highly) likely to be marked as spam.  (Provided by
+  ``gs-group-member-leave-notification.html`` in the group
+  context.)
+
+Member has left:
+  This notification is sent to the group administrators telling
+  them that the member has left. (Provided by
+  ``gs-group-member-leave-left.html`` in the group context.)
+
+Not a member:
+  This notification is sent to the person who tried to leave the
+  group, the email address did not match any member. Normally
+  this occurs when the person has multiple email addresses and
+  rewrite rules when receiving. The message to support that is
+  embedded in this notification is the one that is most commonly
+  seen by `OnlineGroups.net`_ support. (Provided by
+  ``gs-group-member-leave-not-a-member.html`` in the **groups**
+  context, not the group.)
 
 Resources
 =========

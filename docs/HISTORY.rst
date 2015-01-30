@@ -1,6 +1,12 @@
 Changelog
 =========
 
+4.0.1 (2015-01-30)
+------------------
+
+* Fixing the group-URL and email address in the ``mailto:`` of
+  the *Not a member* notification
+
 4.0.0 (2014-09-03)
 ------------------
 
