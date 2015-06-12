@@ -1,13 +1,13 @@
-=========================
-``gs.group.member.leave``
-=========================
+==============================
+``gs.group.member.leave.base``
+==============================
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Leave a GroupServer group
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :Author: `Michael JasonSmith`_
 :Contact: Michael JasonSmith <mpj17@onlinegroups.net>
-:Date: 2015-01-30
+:Date: 2015-06-12
 :Organization: `GroupServer.org`_
 :Copyright: This document is licensed under a
   `Creative Commons Attribution-Share Alike 4.0 International License`_
@@ -52,7 +52,7 @@ Code
 ====
 
 The code is not as sophisticated as the Joining User code. The
-``gs.group.member.leave.GroupLeaver`` is created:
+``gs.group.member.leave.base.GroupLeaver`` is created:
 
 .. code-block:: python
 
@@ -106,8 +106,10 @@ Not a member:
 Resources
 =========
 
-- Code repository: https://github.com/groupserver/gs.group.member.leave/
-- Questions and comments to http://groupserver.org/groups/development
+- Code repository:
+  https://github.com/groupserver/gs.group.member.leave.base/
+- Questions and comments to
+  http://groupserver.org/groups/development
 - Report bugs at https://redmine.iopen.net/projects/groupserver
 
 .. _GroupServer: http://groupserver.org/

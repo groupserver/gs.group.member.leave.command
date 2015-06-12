@@ -1,6 +1,19 @@
 Changelog
 =========
 
+5.0.0 (2015-06-xx)
+------------------
+
+* Renaming the product `gs.group.member.leave.base`_
+* Moving the list command and related notifications to
+  `gs.group.member.leave.command`_
+
+.. _gs.group.member.leave.base:
+   https://github.com/groupserver/gs.group.member.leave.base
+
+.. _gs.group.member.leave.command:
+   https://github.com/groupserver/gs.group.member.leave.command
+
 4.0.1 (2015-01-30)
 ------------------
 
