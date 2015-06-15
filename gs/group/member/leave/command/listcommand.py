@@ -18,10 +18,10 @@ from logging import getLogger
 log = getLogger('gs.group.member.leave.leavecommand')
 from zope.component import createObject
 from gs.group.list.command import CommandResult, CommandABC
+from gs.group.member.leave.base import leave_group
 from Products.CustomUserFolder.interfaces import IGSUserInfo
 from .audit import LeaveAuditor, LEAVE_COMMAND
 from .notifier import NotMemberNotifier
-from .utils import leave_group
 
 
 class LeaveCommand(CommandABC):
