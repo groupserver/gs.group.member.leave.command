@@ -22,7 +22,6 @@ from zope.component import createObject
 from zope.component.interfaces import IFactory
 from zope.interface import implementer, implementedBy
 from Products.XWFCore.XWFUtils import munge_date
-from Products.CustomUserFolder.userinfo import userInfo_to_anchor
 from Products.GSGroup.groupInfo import groupInfo_to_anchor
 from Products.GSAuditTrail import IAuditEvent, BasicAuditEvent, AuditQuery
 from Products.GSAuditTrail.utils import event_id_from_data

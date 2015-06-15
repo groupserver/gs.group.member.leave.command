@@ -13,11 +13,9 @@
 #
 ############################################################################
 from __future__ import unicode_literals
-from zope.component import getMultiAdapter
 from zope.i18n import translate
 from gs.email import send_email
 from gs.content.email.base import AnonymousNotifierABC
-from gs.profile.notify import MessageSender
 from . import GSMessageFactory as _
 
 
