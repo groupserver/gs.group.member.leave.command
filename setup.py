@@ -17,7 +17,7 @@ import os
 from setuptools import setup, find_packages
 from version import get_version
 
-name = 'gs.group.member.leave.base'
+name = 'gs.group.member.leave.command'
 version = get_version()
 
 with codecs.open('README.rst', encoding='utf-8') as f:
@@ -28,7 +28,7 @@ with codecs.open(os.path.join("docs", "HISTORY.rst"),
 
 setup(name=name,
       version=version,
-      description="The pages related to a member leaving a group",
+      description="The email command to leave a group (unsubscribe)",
       long_description=long_description,
       classifiers=[
           'Development Status :: 5 - Production/Stable',
@@ -42,10 +42,8 @@ setup(name=name,
           "Topic :: Software Development :: Libraries :: Python Modules",
       ],
       keywords='user, group, member, group member, leave',
-      author='Alice Murphy',
-      author_email='alice@onlinegroups.net',
-      maintainer='Michael JasonSmith',
-      maintainer_email='mpj17@onlinegroups.net',
+      author='Michael JasonSmith',
+      author_email='mpj17@onlinegroups.net',
       url='https://github.com/groupserver/{0}'.format(name),
       license='ZPL 2.1',
       packages=find_packages(exclude=['ez_setup']),

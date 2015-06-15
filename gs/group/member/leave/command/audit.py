@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ############################################################################
 #
-# Copyright © 2010, 2011, 2012, 2013, 2014 OnlineGroups.net and
+# Copyright © 2015 OnlineGroups.net and
 # Contributors.
 #
 # All Rights Reserved.
@@ -26,19 +26,16 @@ from Products.CustomUserFolder.userinfo import userInfo_to_anchor
 from Products.GSGroup.groupInfo import groupInfo_to_anchor
 from Products.GSAuditTrail import IAuditEvent, BasicAuditEvent, AuditQuery
 from Products.GSAuditTrail.utils import event_id_from_data
-SUBSYSTEM = 'gs.group.member.leave'
+SUBSYSTEM = 'gs.group.member.leave.command'
 from logging import getLogger
 log = getLogger(SUBSYSTEM)
 UNKNOWN = '0'  # Unknown is always "0"
-LEAVE = '1'
-LEAVE_COMMAND = '2'
+LEAVE_COMMAND = '1'
 
 
 @implementer(IFactory)
 class LeaveAuditEventFactory(object):
-    """A Factory for group leaving events.
-    """
-
+    """A Factory for group leaving events."""
     title = 'GroupServer Leave Group Audit Event Factory'
     description = 'Creates a GroupServer event auditor for leaving groups'
 
@@ -46,12 +43,10 @@ class LeaveAuditEventFactory(object):
                  instanceUserInfo, siteInfo, groupInfo, instanceDatum='',
                  supplementaryDatum='', subsystem=''):
         """Create an event"""
-        assert subsystem == SUBSYSTEM, 'Subsystems do not match'
+        if subsystem != SUBSYSTEM:
+            raise ValueError('Subsystems do not match')
 
-        if (code == LEAVE):
-            event = LeaveEvent(context, event_id, date, userInfo,
-                               instanceUserInfo, siteInfo, groupInfo)
-        elif (code == LEAVE_COMMAND):
+        if (code == LEAVE_COMMAND):
             event = LeaveCommand(context, event_id, date, instanceUserInfo,
                                  groupInfo, siteInfo, instanceDatum)
         else:
@@ -64,60 +59,6 @@ class LeaveAuditEventFactory(object):
 
     def getInterfaces(self):
         return implementedBy(BasicAuditEvent)
-
-
-@implementer(IAuditEvent)
-class LeaveEvent(BasicAuditEvent):
-    ''' An audit-trail event representing a user being removed
-        from a group'''
-
-    def __init__(self, context, id, d, userInfo, instanceUserInfo,
-                 siteInfo, groupInfo):
-        """Create a leave event"""
-        super(LeaveEvent, self).__init__(context, id, LEAVE, d, userInfo,
-                                         instanceUserInfo, siteInfo,
-                                         groupInfo, None, None, SUBSYSTEM)
-
-    @property
-    def adminRemoved(self):
-        retval = False
-        if (self.userInfo.id and
-           (self.userInfo.id != self.instanceUserInfo.id)):
-            retval = True
-        return retval
-
-    def __unicode__(self):
-        if self.adminRemoved:
-            r = '{0} ({1}) was removed from {2} ({3}) on {4} ({5}) by {6} '\
-                '({7}).'
-            retval = r.format(
-                self.instanceUserInfo.name,
-                self.instanceUserInfo.id, self.groupInfo.name,
-                self.groupInfo.id, self.siteInfo.name,
-                self.siteInfo.id, self.userInfo.name,
-                self.userInfo.id)
-        else:
-            retval = '%s (%s) left %s (%s) on %s (%s).' % (
-                self.instanceUserInfo.name, self.instanceUserInfo.id,
-                self.groupInfo.name, self.groupInfo.id,
-                self.siteInfo.name, self.siteInfo.id)
-        return retval
-
-    @property
-    def xhtml(self):
-        cssClass = 'audit-event groupserver-group-member-%s' % self.code
-        retval = ''
-        # --=mpj17=-- Sometimes this is false. I do not know why.
-        if self.groupInfo.id:
-            retval = '<span class="%s">Left %s</span>' % \
-                (cssClass, groupInfo_to_anchor(self.groupInfo))
-
-            if self.adminRemoved:
-                retval = '%s &#8212; removed by %s' % \
-                    (retval, userInfo_to_anchor(self.userInfo))
-                retval = '%s (%s)' % \
-                    (retval, munge_date(self.context, self.date))
-        return retval
 
 
 @implementer(IAuditEvent)
@@ -142,7 +83,7 @@ class LeaveCommand(BasicAuditEvent):
 
     @property
     def xhtml(self):
-        cssClass = 'audit-event groupserver-group-member-%s' % self.code
+        cssClass = 'audit-event groupserver-group-member-leave-command-%s' % self.code
         r = '<span class="{0}">Sent an email in to leave {1}</span> ({2})'
         retval = r.format(cssClass, groupInfo_to_anchor(self.groupInfo),
                           munge_date(self.context, self.date))

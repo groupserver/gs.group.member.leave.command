@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configure xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser"
+  xmlns:five="http://namespaces.zope.org/five"
+  i18n_domain="gs.group.member.leave.command">
+
+  <!-- The unsubscribe command -->
+  <adapter
+    name="unsubscribe"
+    for="gs.group.base.interfaces.IGSGroupMarker"
+    provides="gs.group.list.command.interfaces.IEmailCommand"
+    factory=".listcommand.LeaveCommand" />
+
+  <!--The not-a-member notification-->
+  <!-- Note, like the Leave page itself, this page is for -->
+  <!-- the *Groups* folder, not the Group. -->
+   <browser:page
+    name="gs-group-member-leave-not-a-member.html"
+    for="gs.groups.interfaces.IGSGroupsFolder"
+    class=".notification.NotAMemberHTMLNotification"
+    template="browser/templates/not-member-notification.pt"
+    permission="zope2.Public"/>
+   <browser:page
+    name="gs-group-member-leave-not-a-member.txt"
+    for="gs.groups.interfaces.IGSGroupsFolder"
+    class=".notification.NotAMemberTXTNotification"
+    template="browser/templates/not-member-notification-txt.pt"
+    permission="zope2.Public"/>
+
+  <!-- The audit-event factory -->
+  <utility
+    factory=".audit.LeaveAuditEventFactory"
+    name="gs.group.member.leave.command"
+    permission="zope.Public" />
+
+</configure>
