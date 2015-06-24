@@ -12,7 +12,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ############################################################################
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, unicode_literals, print_function
 from email.utils import parseaddr
 from logging import getLogger
 log = getLogger('gs.group.member.leave.leavecommand')
@@ -36,28 +36,30 @@ class LeaveCommand(CommandABC):
 
         retval = CommandResult.notACommand
         if (len(components) == 1):
-            groupInfo = createObject('groupserver.GroupInfo',
-                                     self.group)
             userInfo = self.get_user(email)
             if userInfo:
-                auditor = LeaveAuditor(self.group, userInfo, groupInfo)
+                auditor = LeaveAuditor(self.group, userInfo, self.groupInfo)
                 addr = self.get_email_addr(email)
                 auditor.info(LEAVE_COMMAND, addr)
-
-                leave_group(groupInfo, userInfo, request)
+                leave_group(self.groupInfo, userInfo, request)
             else:
                 addr = self.get_email_addr(email)
                 m = 'Sending a "Cannot leave: not a member" '\
                     'notification to {toEmail} because a Unsubscribe '\
                     'command came in to  {group.name} ({group.id}) '\
                     'on {site.name} ({site.id}).'
-                msg = m.format(toEmail=addr, group=groupInfo,
-                               site=groupInfo.siteInfo)
+                msg = m.format(toEmail=addr, group=self.groupInfo,
+                               site=self.groupInfo.siteInfo)
                 log.info(msg)
                 context = self.group.aq_parent
                 notifier = NotMemberNotifier(context, request)
-                notifier.notify(groupInfo, addr)
+                notifier.notify(self.groupInfo, addr)
             retval = CommandResult.commandStop
+        return retval
+
+    @property
+    def groupInfo(self):
+        retval = createObject('groupserver.GroupInfo', self.group)
         return retval
 
     @staticmethod
