@@ -18,10 +18,11 @@ from logging import getLogger
 log = getLogger('gs.group.member.leave.leavecommand')
 from zope.component import createObject
 from gs.group.list.command import CommandResult, CommandABC
+from gs.group.member.base import user_member_of_group
 from gs.group.member.leave.base import leave_group
 from Products.CustomUserFolder.interfaces import IGSUserInfo
 from .audit import LeaveAuditor, LEAVE_COMMAND
-from .notifier import NotMemberNotifier
+from .notifier import (NotMemberNotifier, NoProfileNotifier)
 
 
 class LeaveCommand(CommandABC):
@@ -33,26 +34,35 @@ class LeaveCommand(CommandABC):
         if components[0] != 'unsubscribe':
             m = 'Not a unsubscribe command: {0}'.format(email['Subject'])
             raise ValueError(m)
+        addr = self.get_email_addr(email)
 
         retval = CommandResult.notACommand
         if (len(components) == 1):
             userInfo = self.get_user(email)
             if userInfo:
-                auditor = LeaveAuditor(self.group, userInfo, self.groupInfo)
-                addr = self.get_email_addr(email)
-                auditor.info(LEAVE_COMMAND, addr)
-                leave_group(self.groupInfo, userInfo, request)
-            else:
-                addr = self.get_email_addr(email)
-                m = 'Sending a "Cannot leave: not a member" '\
-                    'notification to {toEmail} because a Unsubscribe '\
-                    'command came in to  {group.name} ({group.id}) '\
-                    'on {site.name} ({site.id}).'
+                if user_member_of_group(userInfo, self.groupInfo):
+                    auditor = LeaveAuditor(self.group, userInfo, self.groupInfo)
+                    auditor.info(LEAVE_COMMAND, addr)
+                    leave_group(self.groupInfo, userInfo, request)
+                else:  # Not a member
+                    m = 'Sending a "Cannot leave: not a member" notification to {user.name} '\
+                        '({user.id}) at {toEmail} because a Unsubscribe command came in to  '\
+                        '{group.name} ({group.id}) on {site.name} ({site.id}).'
+                    msg = m.format(toEmail=addr, group=self.groupInfo, user=userInfo,
+                                   site=self.groupInfo.siteInfo)
+                    log.info(msg)
+                    context = self.group.aq_parent
+                    notifier = NotMemberNotifier(context, request)
+                    notifier.notify(self.groupInfo, userInfo, addr)
+            else:  # No profile
+                m = 'Sending a "Cannot leave: no profile" notification to {toEmail} because a '\
+                    'Unsubscribe command came in to  {group.name} ({group.id}) on {site.name} '\
+                    '({site.id}).'
                 msg = m.format(toEmail=addr, group=self.groupInfo,
                                site=self.groupInfo.siteInfo)
                 log.info(msg)
                 context = self.group.aq_parent
-                notifier = NotMemberNotifier(context, request)
+                notifier = NoProfileNotifier(context, request)
                 notifier.notify(self.groupInfo, addr)
             retval = CommandResult.commandStop
         return retval

@@ -11,21 +11,37 @@
     provides="gs.group.list.command.interfaces.IEmailCommand"
     factory=".listcommand.LeaveCommand" />
 
-  <!--The not-a-member notification-->
+  <!--The no-profile notification-->
   <!-- Note, like the Leave page itself, this page is for -->
   <!-- the *Groups* folder, not the Group. -->
    <browser:page
-    name="gs-group-member-leave-not-a-member.html"
+    name="gs-group-member-leave-no-profile.html"
     for="gs.groups.interfaces.IGSGroupsFolder"
     class=".notification.NotAMemberHTMLNotification"
-    template="browser/templates/not-member-notification.pt"
+    template="browser/templates/no-profile-notification.pt"
     permission="zope2.Public"/>
    <browser:page
-    name="gs-group-member-leave-not-a-member.txt"
+    name="gs-group-member-leave-no-profile.txt"
     for="gs.groups.interfaces.IGSGroupsFolder"
     class=".notification.NotAMemberTXTNotification"
-    template="browser/templates/not-member-notification-txt.pt"
+    template="browser/templates/no-profile-notification-txt.pt"
     permission="zope2.Public"/>
+
+  <!--The not-a-member notification-->
+  <!-- Note, like the Leave page itself, this page is for -->
+  <!-- the *Groups* folder, not the Group. -->
+   <!--browser:page
+    name="gs-group-member-leave-no-profile.html"
+    for="gs.groups.interfaces.IGSGroupsFolder"
+    class=".notification.NotAMemberHTMLNotification"
+    template="browser/templates/no-profile-notification.pt"
+    permission="zope2.Public"/>
+   <browser:page
+    name="gs-group-member-leave-no-profile.txt"
+    for="gs.groups.interfaces.IGSGroupsFolder"
+    class=".notification.NotAMemberTXTNotification"
+    template="browser/templates/no-profile-notification-txt.pt"
+    permission="zope2.Public"/-->
 
   <!-- The audit-event factory -->
   <utility
