@@ -17,7 +17,7 @@
         <span tal:content="view/groupInfo/name">this group</span>
       </h2>
       <p>
-        Dear
+        Hello
         <span tal:content="userInfo/name">Old Member</span>,
       </p>
       <!-- Explain what has happened.-->
