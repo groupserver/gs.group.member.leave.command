@@ -15,7 +15,7 @@
 from __future__ import absolute_import, unicode_literals, print_function
 from email.utils import parseaddr
 from logging import getLogger
-log = getLogger('gs.group.member.leave.leavecommand')
+log = getLogger('gs.group.member.leave.command.leavecommand')
 from zope.component import createObject
 from gs.group.list.command import CommandResult, CommandABC
 from gs.group.member.base import user_member_of_group
