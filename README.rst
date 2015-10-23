@@ -7,7 +7,7 @@ The email command to leave a group (unsubscribe)
 
 :Author: `Michael JasonSmith`_
 :Contact: Michael JasonSmith <mpj17@onlinegroups.net>
-:Date: 2015-06-15
+:Date: 2015-10-23
 :Organization: `GroupServer.org`_
 :Copyright: This document is licensed under a
   `Creative Commons Attribution-Share Alike 4.0 International License`_
@@ -20,8 +20,8 @@ Introduction
 ============
 
 This part of the code deals with a group member leaving a group
-using the email command_. It also provides the notification_ sent
-to people when they use an unrecognised email address.
+using the email command_. It also provides the notifications_
+sent to people when they use an unrecognised email address.
 
 Command
 =======
@@ -35,18 +35,22 @@ any email that asked for confirmation would look like spam. (The
 behaviour of the *Unsubscribe* command is different to the
 *Subscribe* command [#subscribe]_, which requires confirmation.)
 
-The only complication is the notification_ which is sent out when
+The only complication is the notifications_ which is sent out when
 the email address in the ``From`` header does not match that of a
 group member.
 
-Notification
-============
+Notifications
+=============
 
-The *Not a member* notification is provided by this product. This
-notification is sent to the person who tried to leave the group,
-the email address failed to match a member.
+Two notifications are provided by this product:
 
-Normally an address fails to match when
+#. ``gs-group-member-leave-no-profile.html`` for unrecognised
+   email addresses, and
+#. ``gs-group-member-leave-not-a-member.html`` for people that
+   have a profile but are not members of the group.
+
+
+Normally an address fails to match that of a group member when
 
 * The person has multiple email addresses, **and**
 * Rewrite rules when receiving.
@@ -55,10 +59,9 @@ This is quite common in large organisations. For example someone
 registers with ``a.person@example.com`` and this is rewritten to
 ``another-person@example.com``.
   
-The message to support that is embedded in this notification is
-the one that is most commonly seen by `OnlineGroups.net`_
-support. (Provided by ``gs-group-member-leave-not-a-member.html``
-in the **groups** context, not the group.)
+The message to support that is embedded in these notifications
+are the ones that are most commonly seen by `OnlineGroups.net`_
+support.
 
 Resources
 =========
