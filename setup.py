@@ -73,5 +73,7 @@ setup(name=name,
           'Products.GSGroup',
           'Products.XWFCore',
       ],
+      tests_require=['mock', ],
+      test_suite="{0}.tests.test_all".format(name),
       entry_points="""# -*- Entry points: -*-
       """,)
