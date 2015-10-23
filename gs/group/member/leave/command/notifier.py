@@ -39,7 +39,7 @@ class NotMemberNotifier(NotifierABC):
                                  groupURL=groupInfo.url)
 
         sender = MessageSender(self.context, userInfo)
-        sender.send_message(translatedSubject, text, html, toAddress=toEmailAddress)
+        sender.send_message(translatedSubject, text, html, toAddresses=(toEmailAddress, ))
         self.reset_content_type()
 
 
