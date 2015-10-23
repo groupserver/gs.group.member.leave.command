@@ -29,10 +29,12 @@ class NotMemberNotifier(NotifierABC):
                     'Request to leave ${groupName}',
                     mapping={'groupName': groupInfo.name})
         translatedSubject = translate(subject)
-        html = self.htmlTemplate(emailAddress=toEmailAddress,
+        html = self.htmlTemplate(userInfo=userInfo,
+                                 emailAddress=toEmailAddress,
                                  groupName=groupInfo.name,
                                  groupURL=groupInfo.url)
-        text = self.textTemplate(emailAddress=toEmailAddress,
+        text = self.textTemplate(userInfo=userInfo,
+                                 emailAddress=toEmailAddress,
                                  groupName=groupInfo.name,
                                  groupURL=groupInfo.url)
 

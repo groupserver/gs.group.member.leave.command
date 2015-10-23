@@ -10,7 +10,8 @@
   </head>
   <body>
     <div metal:fill-slot="body"
-         tal:define="emailAddress options/emailAddress | string:person@example.com;
+         tal:define="userInfo options/userInfo | view/loggedInUserInfo;
+                     emailAddress options/emailAddress | string:person@example.com;
                      groupName options/groupName | string:Example Group;
                      groupURL options/groupURL | string:http://lists.example.com/groups/eg/">
       <h2>
@@ -21,19 +22,17 @@
         Hello,
       </p>
       <!-- Explain what has happened.-->
-      <!--   - not in group: no profile -->
+      <!--   - not in group -->
       <p>
         We received an email from you, asking that you be removed
         from
         <span tal:content="groupName">this group</span>.
-        Sadly, we failed to find a profile for the email address
-        <code class="email"
-              tal:content="emailAddress">person@example.com</code>
-        (so you should not be receiving any messages from the
-        group).
+        However, according to our records you are not member of
+        the group (so you should not be receiving any messages
+        from the group).
         <!--Troubleshooting/return/warranty/damage information-->
         Email us at
-        <a tal:attributes="href python:view.get_support_email(emailAddress, groupURL);"
+        <a tal:attributes="href python:view.get_support_email(userInfo, emailAddress, groupURL);"
            href="#"><code tal:content="view/siteInfo/get_support_email"/></a>
         and we will try and fix your group membership.
       </p>

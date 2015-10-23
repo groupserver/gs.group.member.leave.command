@@ -5,7 +5,7 @@
           groupURL options/groupURL | string:http://lists.example.com/groups/eg/">Hello,
 
 <tal:block
-  define="m string:We received an email from you, asking that you be removed from ${groupName}. Sadly, we failed to find a profile for the email address ${emailAddress} (so you should not be receiving any messages from the group). Email us at ${view/siteInfo/get_support_email} and we will try and fix your group membership."
+  define="m string:We received an email from you, asking that you be removed from ${groupName}. However, according to our records you are not member of the group (so you should not be receiving any messages from the group). Email us at ${view/siteInfo/get_support_email} and we will try and fix your group membership."
   content="python:view.fill(m)" />
 
 Kind regards,
