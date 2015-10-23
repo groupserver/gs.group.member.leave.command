@@ -30,6 +30,8 @@ from logging import getLogger
 log = getLogger(SUBSYSTEM)
 UNKNOWN = '0'  # Unknown is always "0"
 LEAVE_COMMAND = '1'
+LEAVE_COMMAND_NOT_MEMBER = '2'
+LEAVE_COMMAND_NO_PROFILE = '3'
 
 
 @implementer(IFactory)
@@ -46,8 +48,14 @@ class LeaveAuditEventFactory(object):
             raise ValueError('Subsystems do not match')
 
         if (code == LEAVE_COMMAND):
-            event = LeaveCommand(context, event_id, date, instanceUserInfo,
-                                 groupInfo, siteInfo, instanceDatum)
+            event = LeaveCommand(context, event_id, date, instanceUserInfo, groupInfo, siteInfo,
+                                 instanceDatum)
+        elif (code == LEAVE_COMMAND_NOT_MEMBER):
+            event = LeaveCommandNotMember(context, event_id, date, instanceUserInfo, groupInfo,
+                                          siteInfo, instanceDatum)
+        elif (code == LEAVE_COMMAND_NO_PROFILE):
+            event = LeaveCommandNoProfile(context, event_id, date, groupInfo, siteInfo,
+                                          instanceDatum)
         else:
             event = BasicAuditEvent(context, event_id, UNKNOWN, date,
                                     instanceUserInfo, instanceUserInfo,
@@ -64,8 +72,7 @@ class LeaveAuditEventFactory(object):
 class LeaveCommand(BasicAuditEvent):
     'The audit-event for an email-command comming in.'
 
-    def __init__(self, context, eventId, d, instanceUserInfo, groupInfo,
-                 siteInfo, email):
+    def __init__(self, context, eventId, d, instanceUserInfo, groupInfo, siteInfo, email):
         super(LeaveCommand, self).__init__(
             context, eventId, LEAVE_COMMAND, d, instanceUserInfo,
             instanceUserInfo, siteInfo, groupInfo, email, None, SUBSYSTEM)
@@ -85,6 +92,63 @@ class LeaveCommand(BasicAuditEvent):
         cssClass = 'audit-event groupserver-group-member-leave-command-%s' % self.code
         r = '<span class="{0}">Sent an email in to leave {1}</span> ({2})'
         retval = r.format(cssClass, groupInfo_to_anchor(self.groupInfo),
+                          munge_date(self.context, self.date))
+        return retval
+
+
+@implementer(IAuditEvent)
+class LeaveCommandNotMember(BasicAuditEvent):
+    'The audit-event for an email-command comming in for someone who is not a member'
+
+    def __init__(self, context, eventId, d, instanceUserInfo, groupInfo, siteInfo, email):
+        super(LeaveCommandNotMember, self).__init__(
+            context, eventId, LEAVE_COMMAND_NOT_MEMBER, d, instanceUserInfo,
+            instanceUserInfo, siteInfo, groupInfo, email, None, SUBSYSTEM)
+
+    def __unicode__(self):
+        r = 'Email-command to leave {0} ({1}) on {2} ({3}) recieved for '\
+            '{4} ({5}) <{6}>, but they are not a member.'
+        retval = r.format(
+            self.groupInfo.name, self.groupInfo.id,
+            self.siteInfo.name, self.siteInfo.id,
+            self.instanceUserInfo.name, self.instanceUserInfo.id,
+            self.instanceDatum)
+        return retval
+
+    @property
+    def xhtml(self):
+        cssClass = 'audit-event groupserver-group-member-leave-command-%s' % self.code
+        r = '<span class="{0}">Sent an email in to leave {1}, but you are not a member of the '\
+            'group</span> ({2})'
+        retval = r.format(cssClass, groupInfo_to_anchor(self.groupInfo),
+                          munge_date(self.context, self.date))
+        return retval
+
+
+@implementer(IAuditEvent)
+class LeaveCommandNoProfile(BasicAuditEvent):
+    'The audit-event for an email-command comming in for someone who lacks a profile'
+
+    def __init__(self, context, eventId, d, groupInfo, siteInfo, email):
+        super(LeaveCommandNoProfile, self).__init__(
+            context, eventId, LEAVE_COMMAND_NO_PROFILE, d, None, None, siteInfo, groupInfo, email,
+            None, SUBSYSTEM)
+
+    def __unicode__(self):
+        r = 'Email-command to leave {0} ({1}) on {2} ({3}) recieved for '\
+            'the address <{4}>, but no profile could be found.'
+        retval = r.format(
+            self.groupInfo.name, self.groupInfo.id,
+            self.siteInfo.name, self.siteInfo.id,
+            self.instanceDatum)
+        return retval
+
+    @property
+    def xhtml(self):
+        cssClass = 'audit-event groupserver-group-member-leave-command-%s' % self.code
+        r = '<span class="{0}">Email-command to leave {1}, recieved from '\
+            '<code class="email">{2}</code> but no profile could be found ({3})'
+        retval = r.format(cssClass, groupInfo_to_anchor(self.groupInfo), self.instanceDatum,
                           munge_date(self.context, self.date))
         return retval
 
@@ -130,9 +194,9 @@ class LeaveAuditor(object):
             * Writes the event to the standard Python log.
         """
         d = datetime.now(UTC)
+        iu = self.instanceUserInfo if (self.instanceUserInfo is not None) else self.userInfo
         eventId = event_id_from_data(
-            self.userInfo,
-            self.instanceUserInfo, self.siteInfo, code, instanceDatum,
+            self.userInfo, iu, self.siteInfo, code, instanceDatum,
             '%s-%s' % (self.groupInfo.name, self.groupInfo.id))
 
         e = self.factory(self.context, eventId, code, d, self.userInfo,
