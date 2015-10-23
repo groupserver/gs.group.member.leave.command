@@ -45,22 +45,19 @@ class LeaveCommand(CommandABC):
                     auditor.info(LEAVE_COMMAND, addr)
                     leave_group(self.groupInfo, userInfo, request)
                 else:  # Not a member
-                    m = 'Sending a "Cannot leave: not a member" notification to {user.name} '\
-                        '({user.id}) at {toEmail} because a Unsubscribe command came in to  '\
-                        '{group.name} ({group.id}) on {site.name} ({site.id}).'
-                    msg = m.format(toEmail=addr, group=self.groupInfo, user=userInfo,
-                                   site=self.groupInfo.siteInfo)
-                    log.info(msg)
+                    m = 'Sending a "Cannot leave: not a member" notification to %s (%s) at <%s> '\
+                        'because a Unsubscribe command came in to %s (%s) on %s (%s)'
+                    log.info(m, userInfo.name, userInfo.id, addr, self.groupInfo.name,
+                             self.groupInfo.id, self.groupInfo.siteInfo.name,
+                             self.groupInfo.siteInfo.id)
                     context = self.group.aq_parent
                     notifier = NotMemberNotifier(context, request)
                     notifier.notify(self.groupInfo, userInfo, addr)
             else:  # No profile
-                m = 'Sending a "Cannot leave: no profile" notification to {toEmail} because a '\
-                    'Unsubscribe command came in to  {group.name} ({group.id}) on {site.name} '\
-                    '({site.id}).'
-                msg = m.format(toEmail=addr, group=self.groupInfo,
-                               site=self.groupInfo.siteInfo)
-                log.info(msg)
+                m = 'Sending a "Cannot leave: no profile" notification to <%s> because a '\
+                    'Unsubscribe command came in to  %s (%s) on %s (%s)'
+                log.info(m, addr, self.groupInfo.name, self.groupInfo.id,
+                         self.groupInfo.siteInfo.name, self.groupInfo.siteInfo.id)
                 context = self.group.aq_parent
                 notifier = NoProfileNotifier(context, request)
                 notifier.notify(self.groupInfo, addr)
